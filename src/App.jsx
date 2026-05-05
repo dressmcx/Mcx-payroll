@@ -3,10 +3,14 @@ import { useState, useEffect } from "react";
 const INITIAL_WORKERS = [
   { id: 1, name: "Ruchala Deutsch",  pin: "1001", rate: 18, email: "", phone: "" },
   { id: 2, name: "Esty 2123", pin: "1002", rate: 16, email: "", phone: "" },
-  { id: 3, name: "Taylor Brown", pin: "1003", rate: 17, email: "", phone: "" },
-  { id: 4, name: "Morgan Lee",   pin: "1004", rate: 15, email: "", phone: "" },
-  { id: 5, name: "Shlomy Sporn", pin: "1005", rate: 19, email: "", phone: "" },
-  { id: 6, name: "Elvia",  pin: "1006", rate: 16, email: "", phone: "" },
+  { id: 3, name: "Gitty Schreiber", pin: "1003", rate: 17, email: "", phone: "" },
+  { id: 4, name: "Miriam Sporn",   pin: "1004", rate: 15, email: "", phone: "" },
+  { id: 5, name: "Sam Sporn", pin: "1005", rate: 19, email: "", phone: "" },
+  { id: 6, name: "shloimy Sporn",  pin: "1056", rate: 16, email: "", phone: "" },
+  { id: 7, name: "Esty Tobl", pin: "1075", rate: 19, email: "", phone: "" },
+  { id: 8, name: "E Sporn", pin: "1605", rate: 19, email: "", phone: "" },
+  { id: 9, name: "S Sporn", pin: "1085", rate: 19, email: "", phone: "" },
+  { id: 10, name: "Elvia", pin: "1090", rate: 19, email: "", phone: "" },
 ];
 
 const MANAGER_PIN = "0000";
