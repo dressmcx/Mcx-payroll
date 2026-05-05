@@ -207,19 +207,16 @@ export default function App() {
   const payRowTotal = () => payRows.reduce((s,r) => s + (parseFloat(r.amount)||0), 0);
 
   const submitPayment = () => {
-    const total = payRowTotal();
-    if (!total || total <= 0) { showToast("Enter a valid amount.", "warning"); return; }
-    const {workerId} = payModal;
-    const rec = {
-      id: Date.now(), amount: total,
-      methods: payRows.filter(r => parseFloat(r.amount) > 0).map(r => ({method:r.method, amount:parseFloat(r.amount)})),
-      date: Date.now(),
-      note: payNote,
-    };
-    setPayments(p => ({...p, [workerId]: [...(p[workerId]||[]), rec]}));
-    showToast(`Payment of ${fmtMoney(total)} recorded for ${workers.find(w=>w.id===workerId)?.name}`, "success");
-    payModalClose();
+  const total = payRowTotal();
+  const { workerId } = payModal;
+  const rec = {
+    id: Date.now(),
+    workerId: workerId,
+    amount: total,
+    date: new Date().toISOString()
   };
+  // ... rest of your payment logic
+};
   c
   const saveManEntry = () => {
     if (!manEntry) return;
