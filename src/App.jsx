@@ -7,7 +7,7 @@ const INITIAL_WORKERS = [
   { id: 4, name: "Miriam Sporn",   pin: "1004", rate: 15, email: "", phone: "" },
   { id: 5, name: "Sam Sporn", pin: "1005", rate: 19, email: "", phone: "" },
   { id: 6, name: "shloimy Sporn",  pin: "1056", rate: 16, email: "", phone: "" },
-  { id: 7, name: "Esty Tobl", pin: "1075", rate: 19, email: "", phone: "" },
+  { id: 7, name: "Esty Tobal", pin: "1075", rate: 19, email: "", phone: "" },
   { id: 8, name: "E Sporn", pin: "1605", rate: 19, email: "", phone: "" },
   { id: 9, name: "S Sporn", pin: "1085", rate: 19, email: "", phone: "" },
   { id: 10, name: "Elvia", pin: "1090", rate: 19, email: "", phone: "" },
