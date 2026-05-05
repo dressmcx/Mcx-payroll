@@ -270,8 +270,8 @@ export default function App() {
       flexDirection:"column", alignItems:"center", justifyContent:"center",
       padding:24, position:"relative" }}>
       <button onClick={() => { setScreen("home"); setPinBuf(""); setPinErr(""); }}
-        style={{ position:"absolute", top:24, left:24, background:"none",
-          border:"none", cursor:"pointer", fontSize:22, color:"#bbb" }}>←</button>
+  style={{ position: 'absolute', top: 24, left: 24, background: 'none',
+    border: 'none', cursor: 'pointer', fontSize: 22, color: '#bbb' }} >-</button>
       <MCXLogo size={50} />
       <h2 style={{ fontFamily:"Georgia,serif", fontSize:24, margin:"14px 0 4px", color:"#0a0a0a" }}>
         {pinTarget==="manager" ? "Manager Login" : workers.find(w=>w.id===pinTarget)?.name}
