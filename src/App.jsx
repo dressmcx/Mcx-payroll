@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 
 const INITIAL_WORKERS = [
   { id: 1, name: "Ruchala Deutsch",  pin: "1001", rate: 18, email: "", phone: "" },
-  { id: 2, name: "Jordan Smith", pin: "1002", rate: 16, email: "", phone: "" },
+  { id: 2, name: "Esty 2123", pin: "1002", rate: 16, email: "", phone: "" },
   { id: 3, name: "Taylor Brown", pin: "1003", rate: 17, email: "", phone: "" },
   { id: 4, name: "Morgan Lee",   pin: "1004", rate: 15, email: "", phone: "" },
-  { id: 5, name: "Casey Wilson", pin: "1005", rate: 19, email: "", phone: "" },
-  { id: 6, name: "Riley Davis",  pin: "1006", rate: 16, email: "", phone: "" },
+  { id: 5, name: "Shlomy Sporn", pin: "1005", rate: 19, email: "", phone: "" },
+  { id: 6, name: "Elvia",  pin: "1006", rate: 16, email: "", phone: "" },
 ];
 
 const MANAGER_PIN = "0000";
