@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 const INITIAL_WORKERS = [
-  { id: 1, name: "Alex Rivera",  pin: "1001", rate: 18, email: "", phone: "" },
+  { id: 1, name: "Ruchala Deutsch",  pin: "1001", rate: 18, email: "", phone: "" },
   { id: 2, name: "Jordan Smith", pin: "1002", rate: 16, email: "", phone: "" },
   { id: 3, name: "Taylor Brown", pin: "1003", rate: 17, email: "", phone: "" },
   { id: 4, name: "Morgan Lee",   pin: "1004", rate: 15, email: "", phone: "" },
