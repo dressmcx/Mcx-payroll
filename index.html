@@ -1,0 +1,1054 @@
+import { useState, useEffect } from "react";
+
+const INITIAL_WORKERS = [
+  { id: 1, name: "Alex Rivera",  pin: "1001", rate: 18, email: "", phone: "" },
+  { id: 2, name: "Jordan Smith", pin: "1002", rate: 16, email: "", phone: "" },
+  { id: 3, name: "Taylor Brown", pin: "1003", rate: 17, email: "", phone: "" },
+  { id: 4, name: "Morgan Lee",   pin: "1004", rate: 15, email: "", phone: "" },
+  { id: 5, name: "Casey Wilson", pin: "1005", rate: 19, email: "", phone: "" },
+  { id: 6, name: "Riley Davis",  pin: "1006", rate: 16, email: "", phone: "" },
+];
+
+const MANAGER_PIN = "0000";
+const SHIFT_START = 9;
+const SHIFT_END   = 19;
+const PAY_METHODS = ["Cash", "Check", "Zelle", "Store Credit"];
+
+const pad      = (n) => String(n).padStart(2, "0");
+const fmtMoney = (n) => `$${Number(n || 0).toFixed(2)}`;
+const fmtTime  = (ts) => {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  let h = d.getHours(), m = d.getMinutes(), ap = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${pad(m)} ${ap}`;
+};
+const fmtDate = (ts) => {
+  if (!ts) return "";
+  const d = new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+};
+const hoursWorked = (list) => {
+  let t = 0;
+  for (const e of list) if (e.out) t += (e.out - e.in) / 3600000;
+  return t;
+};
+const fmtShiftHour = (h) => {
+  const ap = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:00 ${ap}`;
+};
+const useNow = () => {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+};
+
+const MCXLogo = ({ size = 56, light = false }) => (
+  <svg width={size} height={size} viewBox="0 0 200 200" fill="none">
+    <ellipse cx="110" cy="90" rx="75" ry="32" transform="rotate(-30 110 90)"
+      stroke="#c9a96e" strokeWidth="3.5" fill="none" opacity="0.75"/>
+    <ellipse cx="110" cy="100" rx="55" ry="22" transform="rotate(-30 110 100)"
+      stroke="#c9a96e" strokeWidth="2" fill="none" opacity="0.4"/>
+    <text x="28" y="135" fontFamily="Georgia, serif" fontSize="88" fontWeight="700"
+      fill={light ? "#ffffff" : "#0a0a0a"} letterSpacing="-2">mcx</text>
+  </svg>
+);
+
+const ClockWidget = ({ now, dark = false }) => {
+  const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+  return (
+    <div style={{ textAlign:"center", marginBottom: 20 }}>
+      <div style={{ fontSize: 44, fontFamily:"'Courier New',monospace", fontWeight: 700,
+        color: dark ? "#fff" : "#0a0a0a", letterSpacing: 2, lineHeight: 1 }}>
+        {pad(h)}:{pad(m)}:{pad(s)} <span style={{ fontSize:20, color:"#888" }}>{ap}</span>
+      </div>
+      <div style={{ fontSize:13, color:"#777", marginTop:4, letterSpacing:1 }}>
+        {days[now.getDay()]}, {months[now.getMonth()]} {now.getDate()}, {now.getFullYear()}
+      </div>
+    </div>
+  );
+};
+
+const Toast = ({ msg, type, onClose }) => {
+  useEffect(() => { const t = setTimeout(onClose, 4500); return () => clearTimeout(t); }, [onClose]);
+  const bg = type==="success"?"#1a6b3a" : type==="warning"?"#92400e" : "#1e3a8a";
+  return (
+    <div style={{ position:"fixed", top:20, right:20, zIndex:9999, background:bg,
+      color:"#fff", padding:"14px 20px", borderRadius:12, maxWidth:340,
+      boxShadow:"0 8px 32px rgba(0,0,0,.35)", fontSize:14, lineHeight:1.5,
+      animation:"toastIn .3s cubic-bezier(.34,1.2,.64,1)" }}>
+      {msg}
+      <button onClick={onClose} style={{ marginLeft:12, background:"none", border:"none",
+        color:"rgba(255,255,255,.6)", cursor:"pointer", fontSize:16 }}>✕</button>
+    </div>
+  );
+};
+
+export default function App() {
+  const now = useNow();
+
+  const [screen,        setScreen]        = useState("splash");
+  const [splashOut,     setSplashOut]     = useState(false);
+  const [workers,       setWorkers]       = useState(INITIAL_WORKERS);
+  const [entries,       setEntries]       = useState({});
+  const [payments,      setPayments]      = useState({});
+  const [activeWorker,  setActiveWorker]  = useState(null);
+  const [pinBuf,        setPinBuf]        = useState("");
+  const [pinTarget,     setPinTarget]     = useState(null);
+  const [pinErr,        setPinErr]        = useState("");
+  const [toast,         setToast]         = useState(null);
+  const [mTab,          setMTab]          = useState("dashboard");
+  const [editWid,       setEditWid]       = useState(null);
+  const [editForm,      setEditForm]      = useState({});
+  const [addingW,       setAddingW]       = useState(false);
+  const [newW,          setNewW]          = useState({name:"",pin:"",rate:15,email:"",phone:""});
+  const [shiftHours,    setShiftHours]    = useState({start:SHIFT_START,end:SHIFT_END});
+  const [schedEdit,     setSchedEdit]     = useState({start:SHIFT_START,end:SHIFT_END});
+  const [manEntry,      setManEntry]      = useState(null);
+  const [reminders,     setReminders]     = useState([]);
+  const [payModal,      setPayModal]      = useState(null);
+  const [payRows,       setPayRows]       = useState([{method:"Cash",amount:""}]);
+  const [payNote,       setPayNote]       = useState("");
+
+  const showToast = (msg, type="info") => setToast({msg, type});
+
+  // Splash
+  useEffect(() => {
+    const t1 = setTimeout(() => setSplashOut(true), 2400);
+    const t2 = setTimeout(() => setScreen("home"),  3000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  // Reminders
+  useEffect(() => {
+    const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+    if (h === shiftHours.start && m === 15 && s === 0) {
+      workers.forEach(w => {
+        if (!getTodayEntries(w.id).some(e => e.in && !e.out)) {
+          const msg = `⏰ ${w.name} hasn't clocked in! Shift started at ${fmtShiftHour(shiftHours.start)}.`;
+          setReminders(r => [...r, {id:Date.now()+w.id, workerId:w.id, msg, ts:Date.now()}]);
+          showToast(msg, "warning");
+        }
+      });
+    }
+    if (h === shiftHours.end && m === 0 && s === 0) {
+      workers.forEach(w => {
+        if (getTodayEntries(w.id).find(e => e.in && !e.out)) {
+          const msg = `🔔 ${w.name} is still clocked in after shift end!`;
+          setReminders(r => [...r, {id:Date.now()+w.id, workerId:w.id, msg, ts:Date.now()}]);
+          showToast(msg, "warning");
+        }
+      });
+    }
+  }, [now]);
+
+  const getTodayEntries = (wid) => {
+    const td = new Date();
+    return (entries[wid]||[]).filter(e => {
+      const d = new Date(e.in);
+      return d.getDate()===td.getDate() && d.getMonth()===td.getMonth() && d.getFullYear()===td.getFullYear();
+    });
+  };
+  const isClockedIn = (wid) => getTodayEntries(wid).some(e => e.in && !e.out);
+  const weeklyHrs   = (wid) => hoursWorked(entries[wid]||[]);
+  const totalPaid   = (wid) => (payments[wid]||[]).reduce((s,p) => s + p.amount, 0);
+  const weeklyOwed  = (wid) => weeklyHrs(wid) * (workers.find(w=>w.id===wid)?.rate||0);
+  const balanceDue  = (wid) => Math.max(0, weeklyOwed(wid) - totalPaid(wid));
+
+  const clockIn = (wid) => {
+    const ts = Date.now();
+    setEntries(p => ({...p, [wid]: [...(p[wid]||[]), {id:ts,in:ts,out:null,note:""}]}));
+    showToast(`✅ ${workers.find(w=>w.id===wid)?.name} clocked IN at ${fmtTime(ts)}`, "success");
+  };
+  const clockOut = (wid) => {
+    const ts = Date.now();
+    setEntries(p => {
+      const list = [...(p[wid]||[])];
+      const idx  = list.findIndex(e => e.in && !e.out);
+      if (idx === -1) return p;
+      list[idx] = {...list[idx], out:ts};
+      return {...p, [wid]:list};
+    });
+    showToast(`🔴 ${workers.find(w=>w.id===wid)?.name} clocked OUT at ${fmtTime(ts)}`, "info");
+  };
+
+  const handlePin = (d) => {
+    const next = pinBuf + d;
+    setPinBuf(next);
+    if (next.length === 4) {
+      setTimeout(() => {
+        if (pinTarget === "manager") {
+          if (next === MANAGER_PIN) { setScreen("manager"); setMTab("dashboard"); }
+          else setPinErr("Incorrect manager PIN");
+        } else {
+          const w = workers.find(x => x.id === pinTarget);
+          if (w && next === w.pin) { setActiveWorker(w); setScreen("worker"); }
+          else setPinErr("Incorrect PIN");
+        }
+        setPinBuf("");
+      }, 200);
+    }
+  };
+
+  const openPayModal = (wid) => {
+    const bal = balanceDue(wid);
+    setPayModal({workerId: wid});
+    setPayRows([{method:"Cash", amount: bal > 0 ? bal.toFixed(2) : ""}]);
+    setPayNote("");
+  };
+  const addPayRow    = () => setPayRows(r => [...r, {method:"Cash", amount:""}]);
+  const removePayRow = (i) => setPayRows(r => r.filter((_,idx) => idx!==i));
+  const updatePayRow = (i, f, v) => setPayRows(r => r.map((row,idx) => idx===i ? {...row,[f]:v} : row));
+  const payRowTotal  = () => payRows.reduce((s,r) => s + (parseFloat(r.amount)||0), 0);
+
+  const submitPayment = () => {
+    const total = payRowTotal();
+    if (!total || total <= 0) { showToast("Enter a valid amount","warning"); return; }
+    const {workerId} = payModal;
+    const rec = {
+      id: Date.now(), amount: total,
+      methods: payRows.filter(r => parseFloat(r.amount) > 0).map(r => ({method:r.method, amount:parseFloat(r.amount)})),
+      date: Date.now(), note: payNote,
+    };
+    setPayments(p => ({...p, [workerId]: [...(p[workerId]||[]), rec]}));
+    showToast(`✅ Payment of ${fmtMoney(total)} recorded for ${workers.find(w=>w.id===workerId)?.name}`, "success");
+    setPayModal(null);
+  };
+
+  const saveManEntry = () => {
+    if (!manEntry) return;
+    const {workerId, date, inTime, outTime} = manEntry;
+    const [iy,im,id2] = date.split("-").map(Number);
+    const [ih,imin]   = inTime.split(":").map(Number);
+    const inTs = new Date(iy,im-1,id2,ih,imin).getTime();
+    let outTs  = null;
+    if (outTime) {
+      const [oh,omin] = outTime.split(":").map(Number);
+      outTs = new Date(iy,im-1,id2,oh,omin).getTime();
+    }
+    setEntries(p => ({...p, [workerId]: [...(p[workerId]||[]), {id:inTs,in:inTs,out:outTs,note:"Manual entry",manual:true}]}));
+    setManEntry(null);
+    showToast("✅ Manual entry saved", "success");
+  };
+
+  // ── SPLASH ──────────────────────────────────────────────────────────────
+  if (screen === "splash") return (
+    <div style={{ minHeight:"100vh", background:"#0a0a0a", display:"flex",
+      flexDirection:"column", alignItems:"center", justifyContent:"center", gap:18,
+      opacity: splashOut ? 0 : 1, transition:"opacity .6s ease" }}>
+      <div style={{ animation:"popIn .7s cubic-bezier(.34,1.56,.64,1) both" }}>
+        <MCXLogo size={130} light />
+      </div>
+      <div style={{ fontFamily:"Georgia,serif", fontSize:30, color:"#fff", letterSpacing:3,
+        animation:"riseUp .8s .3s both" }}>MCX Time Clock</div>
+      <div style={{ fontSize:12, color:"#444", letterSpacing:4,
+        animation:"riseUp .8s .55s both" }}>PROFESSIONAL PAYROLL SYSTEM</div>
+      <div style={{ marginTop:30, display:"flex", gap:6, animation:"riseUp .8s .8s both" }}>
+        {[0,1,2].map(i=>(
+          <div key={i} style={{ width:6,height:6,borderRadius:"50%",background:"#c9a96e",
+            animation:`pulse 1.2s ${i*.2}s infinite` }}/>
+        ))}
+      </div>
+      <style>{`
+        @keyframes popIn  { from{transform:scale(.4);opacity:0} to{transform:scale(1);opacity:1} }
+        @keyframes riseUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @keyframes pulse  { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.2)} }
+        @keyframes toastIn{ from{transform:translateX(80px);opacity:0} to{transform:translateX(0);opacity:1} }
+      `}</style>
+    </div>
+  );
+
+  // ── PIN PAD ─────────────────────────────────────────────────────────────
+  if (screen === "pin") return (
+    <div style={{ minHeight:"100vh", background:"#f8f6f2", display:"flex",
+      flexDirection:"column", alignItems:"center", justifyContent:"center",
+      padding:24, position:"relative" }}>
+      <button onClick={() => { setScreen("home"); setPinBuf(""); setPinErr(""); }}
+        style={{ position:"absolute", top:24, left:24, background:"none",
+          border:"none", cursor:"pointer", fontSize:22, color:"#bbb" }}>←</button>
+      <MCXLogo size={50} />
+      <h2 style={{ fontFamily:"Georgia,serif", fontSize:24, margin:"14px 0 4px", color:"#0a0a0a" }}>
+        {pinTarget==="manager" ? "Manager Login" : workers.find(w=>w.id===pinTarget)?.name}
+      </h2>
+      <p style={{ color:"#aaa", fontSize:13, marginBottom:24 }}>
+        {pinTarget==="manager" ? "Enter manager PIN" : "Enter your 4-digit PIN"}
+      </p>
+      <div style={{ display:"flex", gap:14, marginBottom:24 }}>
+        {[0,1,2,3].map(i=>(
+          <div key={i} style={{ width:18, height:18, borderRadius:"50%",
+            background: i<pinBuf.length ? "#0a0a0a" : "#ddd", transition:"background .15s" }}/>
+        ))}
+      </div>
+      {pinErr && <div style={{ color:"#dc2626", fontSize:13, marginBottom:12,
+        background:"#fef2f2", padding:"6px 16px", borderRadius:6 }}>{pinErr}</div>}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12, width:240 }}>
+        {[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((d,i) => (
+          <button key={i} onClick={() => {
+            if (d==="⌫") { setPinBuf(p=>p.slice(0,-1)); setPinErr(""); }
+            else if (d!=="") handlePin(String(d));
+          }} disabled={d===""}
+            style={{ height:64, borderRadius:12, border:"none",
+              background: d===""?"transparent" : d==="⌫"?"#f0ece4" : "#fff",
+              color:"#0a0a0a", fontSize:22, fontWeight:600,
+              cursor: d===""?"default":"pointer",
+              boxShadow: d===""||d==="⌫"?"none":"0 2px 10px rgba(0,0,0,.08)" }}>
+            {d}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // ── HOME ─────────────────────────────────────────────────────────────────
+  if (screen === "home") return (
+    <div style={{ minHeight:"100vh", background:"#f8f6f2", display:"flex",
+      flexDirection:"column", alignItems:"center", padding:"28px 16px" }}>
+      {toast && <Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+      <div style={{ width:"100%", maxWidth:480 }}>
+        <div style={{ textAlign:"center", marginBottom:26 }}>
+          <MCXLogo size={80} />
+          <h1 style={{ fontFamily:"Georgia,serif", fontSize:30, margin:"10px 0 4px",
+            color:"#0a0a0a", letterSpacing:-1 }}>MCX Time Clock</h1>
+          <p style={{ color:"#bbb", fontSize:13 }}>Tap your name to clock in or out</p>
+        </div>
+        <ClockWidget now={now} />
+        <div style={{ display:"grid", gap:11, marginBottom:26 }}>
+          {workers.map(w => {
+            const ci = isClockedIn(w.id);
+            const todH = hoursWorked(getTodayEntries(w.id));
+            return (
+              <button key={w.id}
+                onClick={()=>{ setPinTarget(w.id); setPinBuf(""); setPinErr(""); setScreen("pin"); }}
+                style={{ display:"flex", alignItems:"center", justifyContent:"space-between",
+                  background:"#fff", border: ci?"2px solid #16a34a":"2px solid #ece8e0",
+                  borderRadius:14, padding:"14px 18px", cursor:"pointer",
+                  boxShadow: ci?"0 4px 20px rgba(22,163,74,.14)":"0 2px 8px rgba(0,0,0,.05)",
+                  transition:"all .2s" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:13 }}>
+                  <div style={{ width:44, height:44, borderRadius:"50%",
+                    background: ci?"#dcfce7":"#f3f0ea",
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:16, fontWeight:700, color: ci?"#16a34a":"#999" }}>
+                    {w.name.split(" ").map(n=>n[0]).join("")}
+                  </div>
+                  <div style={{ textAlign:"left" }}>
+                    <div style={{ fontFamily:"Georgia,serif", fontSize:16, fontWeight:700, color:"#0a0a0a" }}>{w.name}</div>
+                    <div style={{ fontSize:12, color: ci?"#16a34a":"#ccc", marginTop:2 }}>
+                      {ci ? `● Clocked In · ${todH.toFixed(1)}h today` : "Not clocked in"}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ padding:"5px 13px", borderRadius:20, fontSize:11, fontWeight:700,
+                  letterSpacing:.5, background: ci?"#16a34a":"#f0ece4", color: ci?"#fff":"#aaa" }}>
+                  {ci?"IN":"OUT"}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <button onClick={()=>{ setPinTarget("manager"); setPinBuf(""); setPinErr(""); setScreen("pin"); }}
+          style={{ width:"100%", padding:16, background:"#0a0a0a", color:"#fff",
+            border:"none", borderRadius:12, fontSize:15, fontWeight:600, cursor:"pointer", letterSpacing:.5 }}>
+          Manager Login
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── WORKER ───────────────────────────────────────────────────────────────
+  if (screen === "worker" && activeWorker) {
+    const ci     = isClockedIn(activeWorker.id);
+    const todayE = getTodayEntries(activeWorker.id);
+    const todH   = hoursWorked(todayE);
+    const wkH    = weeklyHrs(activeWorker.id);
+    const active = todayE.find(e => e.in && !e.out);
+    return (
+      <div style={{ minHeight:"100vh", background: ci?"#f0fdf4":"#f8f6f2",
+        display:"flex", flexDirection:"column", alignItems:"center",
+        justifyContent:"center", padding:"28px 16px", position:"relative" }}>
+        {toast && <Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+        <button onClick={()=>{ setScreen("home"); setActiveWorker(null); }}
+          style={{ position:"absolute", top:24, left:24, background:"none",
+            border:"none", cursor:"pointer", fontSize:22, color:"#bbb" }}>←</button>
+        <div style={{ width:"100%", maxWidth:380, textAlign:"center" }}>
+          <MCXLogo size={46} />
+          <div style={{ width:88, height:88, borderRadius:"50%", margin:"16px auto 10px",
+            background: ci?"#dcfce7":"#f3f0ea",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:30, fontWeight:700, color: ci?"#16a34a":"#aaa",
+            border: ci?"3px solid #16a34a":"3px solid #e5e0d5" }}>
+            {activeWorker.name.split(" ").map(n=>n[0]).join("")}
+          </div>
+          <h2 style={{ fontFamily:"Georgia,serif", fontSize:24, margin:"0 0 4px", color:"#0a0a0a" }}>
+            {activeWorker.name}
+          </h2>
+          <div style={{ fontSize:13, color: ci?"#16a34a":"#ccc", marginBottom:18, fontWeight:600 }}>
+            {ci ? `● CLOCKED IN since ${fmtTime(active?.in)}` : "○ NOT CLOCKED IN"}
+          </div>
+          <ClockWidget now={now} />
+          <div style={{ display:"flex", gap:10, marginBottom:20 }}>
+            {[
+              {label:"Today",     value:`${todH.toFixed(2)}h`},
+              {label:"This Week", value:`${wkH.toFixed(2)}h`},
+              {label:"Est. Pay",  value:fmtMoney(wkH * activeWorker.rate)},
+            ].map(s => (
+              <div key={s.label} style={{ flex:1, background:"#fff", borderRadius:12,
+                padding:"12px 8px", boxShadow:"0 2px 8px rgba(0,0,0,.06)" }}>
+                <div style={{ fontSize:17, fontWeight:700, color:"#0a0a0a" }}>{s.value}</div>
+                <div style={{ fontSize:11, color:"#bbb", marginTop:2 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background:"#fff", borderRadius:12, padding:"10px 16px",
+            marginBottom:20, fontSize:13, color:"#888", textAlign:"left",
+            boxShadow:"0 2px 8px rgba(0,0,0,.06)" }}>
+            🕒 Shift: <strong style={{color:"#0a0a0a"}}>{fmtShiftHour(shiftHours.start)} – {fmtShiftHour(shiftHours.end)}</strong>
+          </div>
+          {!ci ? (
+            <button onClick={()=>clockIn(activeWorker.id)}
+              style={{ width:"100%", padding:20, background:"#16a34a", color:"#fff",
+                border:"none", borderRadius:16, fontSize:20, fontWeight:700, cursor:"pointer",
+                boxShadow:"0 8px 28px rgba(22,163,74,.38)", letterSpacing:.5,
+                display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+              <span style={{fontSize:26}}>●</span> CLOCK IN
+            </button>
+          ) : (
+            <button onClick={()=>clockOut(activeWorker.id)}
+              style={{ width:"100%", padding:20, background:"#dc2626", color:"#fff",
+                border:"none", borderRadius:16, fontSize:20, fontWeight:700, cursor:"pointer",
+                boxShadow:"0 8px 28px rgba(220,38,38,.38)", letterSpacing:.5,
+                display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+              <span style={{fontSize:26}}>■</span> CLOCK OUT
+            </button>
+          )}
+          {todayE.length > 0 && (
+            <div style={{ marginTop:20, background:"#fff", borderRadius:12, padding:16,
+              textAlign:"left", boxShadow:"0 2px 8px rgba(0,0,0,.06)" }}>
+              <div style={{ fontWeight:700, fontSize:12, marginBottom:10,
+                color:"#0a0a0a", letterSpacing:.5 }}>TODAY'S LOG</div>
+              {todayE.map((e,i)=>(
+                <div key={i} style={{ display:"flex", justifyContent:"space-between",
+                  padding:"7px 0", borderBottom:"1px solid #f3f0ea", fontSize:13 }}>
+                  <span style={{color:"#16a34a"}}>▲ {fmtTime(e.in)}</span>
+                  <span style={{color: e.out?"#dc2626":"#f59e0b"}}>{e.out?`▼ ${fmtTime(e.out)}`:"● Active"}</span>
+                  <span style={{color:"#aaa"}}>{e.out?`${((e.out-e.in)/3600000).toFixed(2)}h`:"…"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── MANAGER ──────────────────────────────────────────────────────────────
+  if (screen === "manager") {
+    const totalIn      = workers.filter(w=>isClockedIn(w.id)).length;
+    const totalEarned  = workers.reduce((s,w)=>s+weeklyOwed(w.id),0);
+    const totalPaidAll = workers.reduce((s,w)=>s+totalPaid(w.id),0);
+    const totalWkHrs   = workers.reduce((s,w)=>s+weeklyHrs(w.id),0);
+
+    const TABS = [
+      {id:"dashboard", label:"Dashboard"},
+      {id:"payroll",   label:"Payroll"},
+      {id:"workers",   label:"Workers"},
+      {id:"logs",      label:"Logs"},
+      {id:"schedule",  label:"Schedule"},
+      {id:"alerts",    label:`Alerts${reminders.length>0?` (${reminders.length})`:""}`},
+    ];
+
+    return (
+      <div style={{ minHeight:"100vh", background:"#0a0a0a", color:"#fff" }}>
+        {toast && <Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+
+        {/* ═══ PAYMENT MODAL ═══ */}
+        {payModal && (() => {
+          const w   = workers.find(x=>x.id===payModal.workerId);
+          const bal = balanceDue(w.id);
+          const rt  = payRowTotal();
+          return (
+            <div style={{ position:"fixed", inset:0, zIndex:1000,
+              background:"rgba(0,0,0,.85)", display:"flex",
+              alignItems:"center", justifyContent:"center", padding:16 }}>
+              <div style={{ background:"#111", borderRadius:20, width:"100%", maxWidth:480,
+                border:"1px solid #c9a96e", maxHeight:"92vh", overflowY:"auto" }}>
+
+                {/* Modal header */}
+                <div style={{ padding:"20px 24px", borderBottom:"1px solid #1c1c1c",
+                  display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <div>
+                    <div style={{ fontFamily:"Georgia,serif", fontSize:21, fontWeight:700 }}>Record Payment</div>
+                    <div style={{ fontSize:13, color:"#777", marginTop:3 }}>{w.name}</div>
+                  </div>
+                  <button onClick={()=>setPayModal(null)}
+                    style={{ background:"#1c1c1c", border:"none", color:"#888",
+                      width:34, height:34, borderRadius:"50%", cursor:"pointer", fontSize:18 }}>✕</button>
+                </div>
+
+                <div style={{ padding:"20px 24px" }}>
+                  {/* Summary cards */}
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:22 }}>
+                    {[
+                      {label:"Earned",  value:fmtMoney(weeklyOwed(w.id)), color:"#c9a96e"},
+                      {label:"Paid",    value:fmtMoney(totalPaid(w.id)),  color:"#4ade80"},
+                      {label:"Balance", value:fmtMoney(bal), color:bal>0?"#f87171":"#4ade80"},
+                    ].map(s=>(
+                      <div key={s.label} style={{ background:"#0d0d0d", borderRadius:12,
+                        padding:"13px 10px", textAlign:"center", border:"1px solid #1c1c1c" }}>
+                        <div style={{ fontSize:17, fontWeight:700, color:s.color }}>{s.value}</div>
+                        <div style={{ fontSize:11, color:"#555", marginTop:3 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Method rows */}
+                  <div style={{ fontSize:12, color:"#666", fontWeight:700,
+                    letterSpacing:1, marginBottom:10 }}>PAYMENT METHOD(S)</div>
+
+                  {payRows.map((row,i)=>(
+                    <div key={i} style={{ marginBottom:10 }}>
+                      {/* Method buttons */}
+                      <div style={{ display:"flex", gap:6, marginBottom:7, flexWrap:"wrap" }}>
+                        {PAY_METHODS.map(m=>(
+                          <button key={m} onClick={()=>updatePayRow(i,"method",m)}
+                            style={{ padding:"7px 14px", borderRadius:8, border:"none",
+                              cursor:"pointer", fontSize:13, fontWeight:700,
+                              background: row.method===m ? "#c9a96e" : "#1c1c1c",
+                              color: row.method===m ? "#0a0a0a" : "#666",
+                              transition:"all .15s" }}>
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Amount input */}
+                      <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                        <div style={{ position:"relative", flex:1 }}>
+                          <span style={{ position:"absolute", left:12, top:"50%",
+                            transform:"translateY(-50%)", color:"#555", fontSize:15 }}>$</span>
+                          <input type="number" value={row.amount} min="0" step="0.01"
+                            onChange={e=>updatePayRow(i,"amount",e.target.value)}
+                            placeholder="0.00"
+                            style={{ width:"100%", padding:"11px 12px 11px 26px",
+                              background:"#0a0a0a", border:"1px solid #2a2a2a",
+                              borderRadius:8, color:"#fff", fontSize:16, boxSizing:"border-box" }}/>
+                        </div>
+                        {payRows.length > 1 && (
+                          <button onClick={()=>removePayRow(i)}
+                            style={{ background:"#1a0808", border:"none", color:"#dc2626",
+                              width:36, height:36, borderRadius:8, cursor:"pointer", fontSize:18 }}>✕</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  <button onClick={addPayRow}
+                    style={{ width:"100%", padding:"9px", background:"transparent",
+                      border:"1px dashed #2a2a2a", borderRadius:8, color:"#555",
+                      cursor:"pointer", fontSize:13, marginBottom:16 }}>
+                    + Split Payment — Add Another Method
+                  </button>
+
+                  {/* Total */}
+                  <div style={{ background:"#0d0d0d", borderRadius:12, padding:"13px 18px",
+                    marginBottom:16, display:"flex", justifyContent:"space-between",
+                    alignItems:"center", border:"1px solid #1c1c1c" }}>
+                    <span style={{ color:"#666", fontSize:14 }}>Total Being Recorded</span>
+                    <span style={{ color:"#c9a96e", fontSize:22, fontWeight:700 }}>{fmtMoney(rt)}</span>
+                  </div>
+
+                  {/* Note */}
+                  <div style={{ marginBottom:20 }}>
+                    <label style={{ fontSize:12, color:"#555", display:"block", marginBottom:6 }}>
+                      Note (optional)
+                    </label>
+                    <input type="text" value={payNote} onChange={e=>setPayNote(e.target.value)}
+                      placeholder="e.g. Weekly pay, partial payment, bonus…"
+                      style={{ width:"100%", padding:"10px 14px", background:"#0a0a0a",
+                        border:"1px solid #2a2a2a", borderRadius:8, color:"#fff",
+                        fontSize:14, boxSizing:"border-box" }}/>
+                  </div>
+
+                  <div style={{ display:"flex", gap:10 }}>
+                    <button onClick={submitPayment}
+                      style={{ flex:2, padding:14, background:"#c9a96e", border:"none",
+                        borderRadius:12, fontWeight:700, cursor:"pointer",
+                        color:"#0a0a0a", fontSize:16 }}>
+                      ✓ Confirm Payment
+                    </button>
+                    <button onClick={()=>setPayModal(null)}
+                      style={{ flex:1, padding:14, background:"#1c1c1c", border:"none",
+                        borderRadius:12, color:"#666", cursor:"pointer" }}>Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Header */}
+        <div style={{ background:"#0d0d0d", borderBottom:"1px solid #181818",
+          padding:"14px 22px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+            <MCXLogo size={36} light />
+            <div>
+              <div style={{ fontFamily:"Georgia,serif", fontSize:18, fontWeight:700 }}>MCX Manager</div>
+              <div style={{ fontSize:11, color:"#444" }}>Payroll & Time System</div>
+            </div>
+          </div>
+          <button onClick={()=>setScreen("home")}
+            style={{ background:"#1c1c1c", border:"none", color:"#777",
+              padding:"7px 14px", borderRadius:8, cursor:"pointer", fontSize:13 }}>← Exit</button>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display:"flex", gap:2, padding:"14px 22px 0",
+          overflowX:"auto", borderBottom:"1px solid #181818" }}>
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>setMTab(t.id)}
+              style={{ padding:"8px 16px", borderRadius:"8px 8px 0 0", border:"none",
+                cursor:"pointer", fontSize:13, fontWeight:600, whiteSpace:"nowrap",
+                background: mTab===t.id ? "#181818" : "transparent",
+                color: mTab===t.id ? "#c9a96e" : "#555",
+                borderBottom: mTab===t.id ? "2px solid #c9a96e" : "2px solid transparent" }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ padding:"22px", maxWidth:940, margin:"0 auto" }}>
+
+          {/* ─ DASHBOARD ─ */}
+          {mTab === "dashboard" && (
+            <div>
+              <ClockWidget now={now} dark />
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",
+                gap:12, marginBottom:24 }}>
+                {[
+                  {label:"Workers",     value:workers.length,               icon:"👥"},
+                  {label:"Clocked In",  value:totalIn,                      icon:"✅", c:"#16a34a"},
+                  {label:"Weekly Hrs",  value:`${totalWkHrs.toFixed(1)}h`,  icon:"⏱"},
+                  {label:"Total Earned",value:fmtMoney(totalEarned),        icon:"💵", c:"#c9a96e"},
+                  {label:"Total Paid",  value:fmtMoney(totalPaidAll),       icon:"✓",  c:"#4ade80"},
+                  {label:"Outstanding", value:fmtMoney(Math.max(0,totalEarned-totalPaidAll)),icon:"⚠️",c:"#f87171"},
+                ].map(k=>(
+                  <div key={k.label} style={{ background:"#111", borderRadius:14,
+                    padding:"16px 14px", border:"1px solid #1c1c1c" }}>
+                    <div style={{ fontSize:22, marginBottom:6 }}>{k.icon}</div>
+                    <div style={{ fontSize:22, fontWeight:700, color:k.c||"#fff",
+                      fontFamily:"Georgia,serif" }}>{k.value}</div>
+                    <div style={{ fontSize:11, color:"#555", marginTop:3 }}>{k.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background:"#111", borderRadius:14, border:"1px solid #1c1c1c", overflow:"hidden" }}>
+                <div style={{ padding:"14px 20px", borderBottom:"1px solid #181818",
+                  fontSize:11, color:"#555", fontWeight:700, letterSpacing:1 }}>WORKER SUMMARY</div>
+                <div style={{ overflowX:"auto" }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", minWidth:560 }}>
+                    <thead>
+                      <tr style={{ background:"#0d0d0d" }}>
+                        {["Name","Status","Hrs","Earned","Paid","Balance","Action"].map(h=>(
+                          <th key={h} style={{ padding:"9px 14px", fontSize:11, color:"#555",
+                            fontWeight:700, letterSpacing:.5, textAlign:"left" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {workers.map((w,i)=>{
+                        const ci=isClockedIn(w.id), wh=weeklyHrs(w.id);
+                        const earned=weeklyOwed(w.id), paid=totalPaid(w.id), bal=balanceDue(w.id);
+                        return (
+                          <tr key={w.id} style={{ borderTop:"1px solid #181818",
+                            background:i%2===0?"#111":"#0e0e0e" }}>
+                            <td style={{ padding:"11px 14px", fontFamily:"Georgia,serif",
+                              fontSize:14, fontWeight:600 }}>{w.name}</td>
+                            <td style={{ padding:"11px 14px" }}>
+                              <span style={{ padding:"3px 9px", borderRadius:20, fontSize:11, fontWeight:700,
+                                background:ci?"#14532d":"#1c1c1c", color:ci?"#4ade80":"#555" }}>
+                                {ci?"● IN":"○ OUT"}
+                              </span>
+                            </td>
+                            <td style={{ padding:"11px 14px", color:"#aaa", fontSize:13 }}>{wh.toFixed(1)}h</td>
+                            <td style={{ padding:"11px 14px", color:"#c9a96e", fontSize:13 }}>{fmtMoney(earned)}</td>
+                            <td style={{ padding:"11px 14px", color:"#4ade80", fontSize:13 }}>{fmtMoney(paid)}</td>
+                            <td style={{ padding:"11px 14px", fontSize:13, fontWeight:700,
+                              color:bal>0?"#f87171":"#4ade80" }}>{fmtMoney(bal)}</td>
+                            <td style={{ padding:"11px 14px" }}>
+                              <button onClick={()=>openPayModal(w.id)}
+                                style={{ padding:"6px 14px", background:"#c9a96e", border:"none",
+                                  borderRadius:7, color:"#0a0a0a", fontWeight:700,
+                                  cursor:"pointer", fontSize:12 }}>Pay</button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ─ PAYROLL ─ */}
+          {mTab === "payroll" && (
+            <div>
+              <h2 style={{ fontFamily:"Georgia,serif", fontSize:22, marginBottom:20 }}>Payroll & Payments</h2>
+              <div style={{ display:"grid", gap:16 }}>
+                {workers.map(w => {
+                  const wh=weeklyHrs(w.id), earned=weeklyOwed(w.id);
+                  const paid=totalPaid(w.id), bal=balanceDue(w.id);
+                  const hist=(payments[w.id]||[]).slice().reverse();
+                  return (
+                    <div key={w.id} style={{ background:"#111", borderRadius:16,
+                      border:"1px solid #1c1c1c", overflow:"hidden" }}>
+                      {/* Top row */}
+                      <div style={{ padding:"18px 22px", borderBottom:"1px solid #181818",
+                        display:"flex", justifyContent:"space-between",
+                        alignItems:"center", flexWrap:"wrap", gap:12 }}>
+                        <div>
+                          <div style={{ fontFamily:"Georgia,serif", fontSize:18, fontWeight:700 }}>{w.name}</div>
+                          <div style={{ fontSize:12, color:"#555", marginTop:3 }}>
+                            {wh.toFixed(2)} hrs · ${w.rate}/hr
+                          </div>
+                        </div>
+                        <div style={{ display:"flex", gap:14, alignItems:"center" }}>
+                          <div style={{ textAlign:"right" }}>
+                            <div style={{ fontSize:11, color:"#555" }}>Balance Due</div>
+                            <div style={{ fontSize:24, fontWeight:700,
+                              color:bal>0?"#f87171":"#4ade80" }}>{fmtMoney(bal)}</div>
+                          </div>
+                          <button onClick={()=>openPayModal(w.id)}
+                            style={{ padding:"11px 22px", background:"#c9a96e", border:"none",
+                              borderRadius:10, color:"#0a0a0a", fontWeight:700,
+                              cursor:"pointer", fontSize:14 }}>
+                            Pay Worker
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Stats bar */}
+                      <div style={{ display:"flex", borderBottom:"1px solid #181818" }}>
+                        {[
+                          {label:"Earned",value:fmtMoney(earned),c:"#c9a96e"},
+                          {label:"Paid",  value:fmtMoney(paid),  c:"#4ade80"},
+                          {label:"Owed",  value:fmtMoney(bal),   c:bal>0?"#f87171":"#4ade80"},
+                        ].map((s,i)=>(
+                          <div key={s.label} style={{ flex:1, padding:"12px 16px",
+                            borderRight:i<2?"1px solid #181818":"none", background:"#0d0d0d" }}>
+                            <div style={{ fontSize:17, fontWeight:700, color:s.c }}>{s.value}</div>
+                            <div style={{ fontSize:11, color:"#555", marginTop:2 }}>{s.label}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* History */}
+                      {hist.length > 0 ? (
+                        <div style={{ padding:"14px 22px" }}>
+                          <div style={{ fontSize:11, color:"#555", fontWeight:700,
+                            letterSpacing:1, marginBottom:10 }}>PAYMENT HISTORY</div>
+                          {hist.map(p=>(
+                            <div key={p.id} style={{ padding:"10px 0",
+                              borderBottom:"1px solid #0d0d0d",
+                              display:"flex", justifyContent:"space-between",
+                              alignItems:"flex-start", fontSize:13 }}>
+                              <div>
+                                <div style={{ marginBottom:4 }}>
+                                  {p.methods.map((m,mi)=>(
+                                    <span key={mi} style={{ marginRight:10 }}>
+                                      <span style={{ color:"#c9a96e", fontWeight:700 }}>{m.method}</span>
+                                      <span style={{ color:"#666" }}> {fmtMoney(m.amount)}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                                {p.note && <div style={{ color:"#555", fontSize:12 }}>{p.note}</div>}
+                              </div>
+                              <div style={{ textAlign:"right", flexShrink:0, marginLeft:16 }}>
+                                <div style={{ color:"#4ade80", fontWeight:700 }}>{fmtMoney(p.amount)}</div>
+                                <div style={{ color:"#444", fontSize:11, marginTop:2 }}>{fmtDate(p.date)}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ padding:"16px 22px", color:"#444", fontSize:13 }}>
+                          No payments recorded yet.
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ─ WORKERS ─ */}
+          {mTab === "workers" && (
+            <div>
+              <div style={{ display:"flex", justifyContent:"space-between",
+                alignItems:"center", marginBottom:18 }}>
+                <h2 style={{ fontFamily:"Georgia,serif", fontSize:22, margin:0 }}>Workers</h2>
+                <button onClick={()=>{ setAddingW(true); setNewW({name:"",pin:"",rate:15,email:"",phone:""}); }}
+                  style={{ background:"#c9a96e", border:"none", color:"#0a0a0a",
+                    padding:"9px 18px", borderRadius:8, cursor:"pointer", fontWeight:700 }}>
+                  + Add Worker
+                </button>
+              </div>
+              {addingW && (
+                <div style={{ background:"#111", borderRadius:14, padding:20,
+                  border:"1px solid #333", marginBottom:16 }}>
+                  <h3 style={{ margin:"0 0 14px", color:"#c9a96e" }}>New Worker</h3>
+                  {[["Name","name","text"],["PIN (4 digits)","pin","text"],
+                    ["Hourly Rate ($)","rate","number"],["Email","email","email"],["Phone","phone","tel"]
+                  ].map(([label,field,type])=>(
+                    <div key={field} style={{ marginBottom:10 }}>
+                      <label style={{ fontSize:12, color:"#555", display:"block", marginBottom:4 }}>{label}</label>
+                      <input type={type} value={newW[field]}
+                        onChange={e=>setNewW(p=>({...p,[field]:e.target.value}))}
+                        style={{ width:"100%", padding:"9px 12px", background:"#0a0a0a",
+                          border:"1px solid #2a2a2a", borderRadius:8, color:"#fff",
+                          fontSize:14, boxSizing:"border-box" }}/>
+                    </div>
+                  ))}
+                  <div style={{ display:"flex", gap:8, marginTop:12 }}>
+                    <button onClick={()=>{
+                      if (!newW.name||!newW.pin||newW.pin.length!==4) {
+                        showToast("Name and 4-digit PIN required","warning"); return;
+                      }
+                      setWorkers(p=>[...p,{id:Date.now(),...newW,rate:Number(newW.rate)}]);
+                      setAddingW(false);
+                      showToast(`✅ ${newW.name} added`,"success");
+                    }} style={{ flex:1, padding:"9px", background:"#c9a96e", border:"none",
+                      borderRadius:8, fontWeight:700, cursor:"pointer", color:"#0a0a0a" }}>Save</button>
+                    <button onClick={()=>setAddingW(false)}
+                      style={{ flex:1, padding:"9px", background:"#1c1c1c", border:"none",
+                        borderRadius:8, color:"#777", cursor:"pointer" }}>Cancel</button>
+                  </div>
+                </div>
+              )}
+              <div style={{ display:"grid", gap:10 }}>
+                {workers.map(w=>(
+                  <div key={w.id} style={{ background:"#111", borderRadius:14,
+                    padding:"14px 18px", border:"1px solid #1c1c1c",
+                    display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                    {editWid===w.id ? (
+                      <div style={{ flex:1 }}>
+                        {[["Name","name","text"],["PIN","pin","text"],["Rate","rate","number"],
+                          ["Email","email","email"],["Phone","phone","tel"]
+                        ].map(([label,field,type])=>(
+                          <div key={field} style={{ display:"flex", alignItems:"center",
+                            gap:8, marginBottom:8 }}>
+                            <label style={{ fontSize:11, color:"#555", width:78 }}>{label}</label>
+                            <input type={type} value={editForm[field]||""}
+                              onChange={e=>setEditForm(p=>({...p,[field]:e.target.value}))}
+                              style={{ flex:1, padding:"7px 10px", background:"#0a0a0a",
+                                border:"1px solid #2a2a2a", borderRadius:6, color:"#fff", fontSize:13 }}/>
+                          </div>
+                        ))}
+                        <div style={{ display:"flex", gap:8, marginTop:8 }}>
+                          <button onClick={()=>{
+                            setWorkers(p=>p.map(x=>x.id===w.id?{...x,...editForm,rate:Number(editForm.rate)}:x));
+                            setEditWid(null); showToast("✅ Updated","success");
+                          }} style={{ flex:1, padding:"8px", background:"#c9a96e", border:"none",
+                            borderRadius:6, fontWeight:700, cursor:"pointer", color:"#0a0a0a" }}>Save</button>
+                          <button onClick={()=>setEditWid(null)}
+                            style={{ flex:1, padding:"8px", background:"#1c1c1c", border:"none",
+                              borderRadius:6, color:"#777", cursor:"pointer" }}>Cancel</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <div style={{ fontFamily:"Georgia,serif", fontSize:15, fontWeight:700 }}>{w.name}</div>
+                          <div style={{ fontSize:12, color:"#555", marginTop:3 }}>
+                            PIN: ••••  ·  ${w.rate}/hr{w.email?`  ·  ${w.email}`:""}
+                          </div>
+                        </div>
+                        <div style={{ display:"flex", gap:8 }}>
+                          <button onClick={()=>{
+                            setEditWid(w.id);
+                            setEditForm({name:w.name,pin:w.pin,rate:w.rate,email:w.email||"",phone:w.phone||""});
+                          }} style={{ padding:"6px 14px", background:"#1c1c1c", border:"none",
+                            borderRadius:6, color:"#888", cursor:"pointer", fontSize:13 }}>Edit</button>
+                          <button onClick={()=>{
+                            if(window.confirm(`Remove ${w.name}?`)){
+                              setWorkers(p=>p.filter(x=>x.id!==w.id));
+                              showToast(`${w.name} removed`,"info");
+                            }
+                          }} style={{ padding:"6px 10px", background:"#1a0808", border:"none",
+                            borderRadius:6, color:"#dc2626", cursor:"pointer", fontSize:13 }}>✕</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ─ LOGS ─ */}
+          {mTab === "logs" && (
+            <div>
+              <div style={{ display:"flex", justifyContent:"space-between",
+                alignItems:"center", marginBottom:18 }}>
+                <h2 style={{ fontFamily:"Georgia,serif", fontSize:22, margin:0 }}>Clock Logs</h2>
+                <button onClick={()=>setManEntry({
+                  workerId:workers[0]?.id,
+                  date:new Date().toISOString().slice(0,10),
+                  inTime:"09:00", outTime:""
+                })} style={{ background:"#c9a96e", border:"none", color:"#0a0a0a",
+                  padding:"9px 18px", borderRadius:8, cursor:"pointer", fontWeight:700 }}>
+                  + Manual Entry
+                </button>
+              </div>
+              {manEntry && (
+                <div style={{ background:"#111", borderRadius:14, padding:20,
+                  border:"1px solid #c9a96e", marginBottom:18 }}>
+                  <h3 style={{ margin:"0 0 14px", color:"#c9a96e" }}>Manual Clock Entry</h3>
+                  <div style={{ marginBottom:10 }}>
+                    <label style={{ fontSize:12, color:"#555", display:"block", marginBottom:4 }}>Worker</label>
+                    <select value={manEntry.workerId}
+                      onChange={e=>setManEntry(p=>({...p,workerId:Number(e.target.value)}))}
+                      style={{ width:"100%", padding:"9px 12px", background:"#0a0a0a",
+                        border:"1px solid #2a2a2a", borderRadius:8, color:"#fff", fontSize:14 }}>
+                      {workers.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}
+                    </select>
+                  </div>
+                  {[["Date","date","date"],["Clock In","inTime","time"],["Clock Out (optional)","outTime","time"]].map(([label,field,type])=>(
+                    <div key={field} style={{ marginBottom:10 }}>
+                      <label style={{ fontSize:12, color:"#555", display:"block", marginBottom:4 }}>{label}</label>
+                      <input type={type} value={manEntry[field]}
+                        onChange={e=>setManEntry(p=>({...p,[field]:e.target.value}))}
+                        style={{ width:"100%", padding:"9px 12px", background:"#0a0a0a",
+                          border:"1px solid #2a2a2a", borderRadius:8, color:"#fff",
+                          fontSize:14, boxSizing:"border-box" }}/>
+                    </div>
+                  ))}
+                  <div style={{ display:"flex", gap:8, marginTop:10 }}>
+                    <button onClick={saveManEntry}
+                      style={{ flex:1, padding:"9px", background:"#c9a96e", border:"none",
+                        borderRadius:8, fontWeight:700, cursor:"pointer", color:"#0a0a0a" }}>Save</button>
+                    <button onClick={()=>setManEntry(null)}
+                      style={{ flex:1, padding:"9px", background:"#1c1c1c", border:"none",
+                        borderRadius:8, color:"#777", cursor:"pointer" }}>Cancel</button>
+                  </div>
+                </div>
+              )}
+              {workers.map(w=>{
+                const all=(entries[w.id]||[]).slice().reverse();
+                if (!all.length) return null;
+                return (
+                  <div key={w.id} style={{ background:"#111", borderRadius:14,
+                    border:"1px solid #1c1c1c", marginBottom:14, overflow:"hidden" }}>
+                    <div style={{ padding:"12px 18px", borderBottom:"1px solid #181818",
+                      display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <span style={{ fontFamily:"Georgia,serif", fontWeight:700, fontSize:15 }}>{w.name}</span>
+                      <span style={{ fontSize:12, color:"#555" }}>{all.length} entries</span>
+                    </div>
+                    {all.map((e,i)=>(
+                      <div key={i} style={{ padding:"10px 18px", borderBottom:"1px solid #0d0d0d",
+                        display:"flex", justifyContent:"space-between", fontSize:13 }}>
+                        <span style={{color:"#555"}}>{fmtDate(e.in)}</span>
+                        <span style={{color:"#4ade80"}}>▲ {fmtTime(e.in)}</span>
+                        <span style={{color:e.out?"#f87171":"#f59e0b"}}>{e.out?`▼ ${fmtTime(e.out)}`:"● Active"}</span>
+                        <span style={{color:"#777"}}>{e.out?`${((e.out-e.in)/3600000).toFixed(2)}h`:"…"}</span>
+                        {e.manual&&<span style={{color:"#c9a96e",fontSize:11}}>Manual</span>}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ─ SCHEDULE ─ */}
+          {mTab === "schedule" && (
+            <div>
+              <h2 style={{ fontFamily:"Georgia,serif", fontSize:22, marginBottom:18 }}>Shift Schedule</h2>
+              <div style={{ background:"#111", borderRadius:14, padding:22,
+                border:"1px solid #1c1c1c", marginBottom:16 }}>
+                <h3 style={{ margin:"0 0 16px", color:"#c9a96e", fontSize:15 }}>Default Shift Hours</h3>
+                <div style={{ display:"flex", gap:18, marginBottom:18 }}>
+                  {[["Shift Start","start"],["Shift End","end"]].map(([label,field])=>(
+                    <div key={field} style={{ flex:1 }}>
+                      <label style={{ fontSize:12, color:"#555", display:"block", marginBottom:5 }}>{label}</label>
+                      <input type="number" min={0} max={23} value={schedEdit[field]}
+                        onChange={e=>setSchedEdit(p=>({...p,[field]:Number(e.target.value)}))}
+                        style={{ width:"100%", padding:11, background:"#0a0a0a",
+                          border:"1px solid #2a2a2a", borderRadius:8, color:"#fff",
+                          fontSize:18, textAlign:"center", boxSizing:"border-box" }}/>
+                      <div style={{ fontSize:11, color:"#555", marginTop:3, textAlign:"center" }}>
+                        {fmtShiftHour(schedEdit[field])}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={()=>{ setShiftHours(schedEdit); showToast(`✅ Shift: ${fmtShiftHour(schedEdit.start)} – ${fmtShiftHour(schedEdit.end)}`,"success"); }}
+                  style={{ width:"100%", padding:12, background:"#c9a96e", border:"none",
+                    borderRadius:8, fontWeight:700, cursor:"pointer", color:"#0a0a0a", fontSize:15 }}>
+                  Save Shift Hours
+                </button>
+              </div>
+              <div style={{ background:"#111", borderRadius:14, padding:20, border:"1px solid #1c1c1c" }}>
+                <div style={{ fontSize:12, color:"#555", fontWeight:700, letterSpacing:1, marginBottom:14 }}>HOW REMINDERS WORK</div>
+                <div style={{ fontSize:14, color:"#888", lineHeight:1.9 }}>
+                  <p>⏰ <strong style={{color:"#ddd"}}>Late clock-in alert</strong> — fires 15 min after shift start if a worker hasn't clocked in.</p>
+                  <p>🔔 <strong style={{color:"#ddd"}}>Forgot to clock-out alert</strong> — fires at shift end if a worker is still active.</p>
+                  <p>📋 <strong style={{color:"#ddd"}}>Manager fix</strong> — use Logs → Manual Entry to correct any missed punches.</p>
+                  <p style={{color:"#444",fontSize:12,marginTop:14}}>For real SMS/email: after hosting, connect Twilio (SMS) or SendGrid (email).</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ─ ALERTS ─ */}
+          {mTab === "alerts" && (
+            <div>
+              <div style={{ display:"flex", justifyContent:"space-between",
+                alignItems:"center", marginBottom:18 }}>
+                <h2 style={{ fontFamily:"Georgia,serif", fontSize:22, margin:0 }}>Alerts & Reminders</h2>
+                {reminders.length>0 && (
+                  <button onClick={()=>setReminders([])}
+                    style={{ background:"#1c1c1c", border:"none", color:"#777",
+                      padding:"7px 14px", borderRadius:8, cursor:"pointer", fontSize:13 }}>Clear All</button>
+                )}
+              </div>
+              {reminders.length===0 ? (
+                <div style={{ background:"#111", borderRadius:14, padding:40,
+                  border:"1px solid #1c1c1c", textAlign:"center" }}>
+                  <div style={{ fontSize:36, marginBottom:10 }}>✅</div>
+                  <div style={{ color:"#555" }}>No alerts. All workers are on schedule.</div>
+                </div>
+              ) : (
+                <div style={{ display:"grid", gap:10 }}>
+                  {reminders.slice().reverse().map(r=>(
+                    <div key={r.id} style={{ background:"#140e00", borderRadius:12,
+                      padding:"14px 18px", border:"1px solid #3a2800",
+                      display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <div>
+                        <div style={{ fontSize:14, color:"#f59e0b", marginBottom:3 }}>{r.msg}</div>
+                        <div style={{ fontSize:11, color:"#555" }}>{fmtDate(r.ts)} {fmtTime(r.ts)}</div>
+                      </div>
+                      <button onClick={()=>setReminders(p=>p.filter(x=>x.id!==r.id))}
+                        style={{ background:"none", border:"none", color:"#555",
+                          cursor:"pointer", fontSize:18 }}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
