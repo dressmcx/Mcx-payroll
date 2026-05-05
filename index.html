@@ -201,26 +201,26 @@ export default function App() {
     setPayModal({workerId: wid});
     setPayRows([{method:"Cash", amount: bal > 0 ? bal.toFixed(2) : ""}]);
     setPayNote("");
-  };
-  const addPayRow    = () => setPayRows(r => [...r, {method:"Cash", amount:""}]);
-  const removePayRow = (i) => setPayRows(r => r.filter((_,idx) => idx!==i));
-  const updatePayRow = (i, f, v) => setPayRows(r => r.map((row,idx) => idx===i ? {...row,[f]:v} : row));
-  const payRowTotal  = () => payRows.reduce((s,r) => s + (parseFloat(r.amount)||0), 0);
+  };const addPayRow = () => setPayRows(r => [...r, {method: "Cash", amount:""}])
+  const removePayRow = (i) => setPayRows(r => r.filter((_, idx) => idx!==i));
+  const updatePayRow = (i, f, v) => setPayRows(r => r.map((row,idx) => idx===i ? {...row, [f]:v} : row))
+  const payRowTotal = () => payRows.reduce((s,r) => s + (parseFloat(r.amount)||0), 0);
 
   const submitPayment = () => {
     const total = payRowTotal();
-    if (!total || total <= 0) { showToast("Enter a valid amount","warning"); return; }
+    if (!total || total <= 0) { showToast("Enter a valid amount.", "warning"); return; }
     const {workerId} = payModal;
     const rec = {
       id: Date.now(), amount: total,
       methods: payRows.filter(r => parseFloat(r.amount) > 0).map(r => ({method:r.method, amount:parseFloat(r.amount)})),
-      date: Date.now(), note: payNote,
+      date: Date.now(),
+      note: payNote,
     };
     setPayments(p => ({...p, [workerId]: [...(p[workerId]||[]), rec]}));
-    showToast(`✅ Payment of ${fmtMoney(total)} recorded for ${workers.find(w=>w.id===workerId)?.name}`, "success");
-    setPayModal(null);
+    showToast(`Payment of ${fmtMoney(total)} recorded for ${workers.find(w=>w.id===workerId)?.name}`, "success");
+    payModalClose();
   };
-
+  c
   const saveManEntry = () => {
     if (!manEntry) return;
     const {workerId, date, inTime, outTime} = manEntry;
