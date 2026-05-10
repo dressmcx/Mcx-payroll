@@ -29,7 +29,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 const STORE_LAT=25.7617, STORE_LNG=-80.1918, STORE_RADIUS=200;
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const MANAGER_PIN="0000";
+const MANAGER_PIN="5824";
 const PAY_METHODS=["Cash","Check","Zelle","Store Credit"];
 const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const DEFAULT_SCHED={
