@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
+const resendApiKey = import.meta.env.VITE_RESEND_API_KEY;
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const T = {
