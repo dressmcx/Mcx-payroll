@@ -26,7 +26,7 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRn
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── STORE LOCATION ───────────────────────────────────────────────────────────
-const STORE_LAT=25.7617, STORE_LNG=-80.1918, STORE_RADIUS=200;
+const STORE_LAT=40.700763, STORE_LNG=-73.949922, STORE_RADIUS=200;
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const MANAGER_PIN="5824";
