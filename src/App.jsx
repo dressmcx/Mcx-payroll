@@ -15,71 +15,26 @@ const T = {
 };
 
 // ─── LOGO (embedded image) ────────────────────────────────────────────────────
+// Put your transparent PNG logo inside:
+// /public/mcx-logo.png
+
+const LOGO_SRC = "/mcx-logo.png";
+
 const Logo = ({ size = 56 }) => (
-  <div
+  <img
+    src={LOGO_SRC}
+    alt="MCX"
+    width={size}
+    height={size}
     style={{
-      position: "relative",
-      width: size,
-      height: size,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      overflow: "visible",
+      objectFit: "contain",
+      display: "block",
+      background: "transparent",
     }}
-  >
-    {/* Background Script */}
-    <svg
-      viewBox="0 0 200 120"
-      width={size * 1.8}
-      height={size * 1.8}
-      style={{
-        position: "absolute",
-        opacity: 0.22,
-      }}
-    >
-      <path
-        d="M10 85 
-           C40 55, 80 25, 145 10
-           C175 5, 185 40, 165 60
-           C150 75, 120 82, 95 95
-           C70 108, 45 112, 20 100"
-        fill="none"
-        stroke="#BFC3C7"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-
-      <path
-        d="M55 100 
-           C90 72, 125 62, 180 52"
-        fill="none"
-        stroke="#D5D8DB"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
-    </svg>
-
-    {/* MCX Text */}
-    <span
-      style={{
-        position: "relative",
-        zIndex: 2,
-        fontFamily: '"Bodoni Moda", "Didot", serif',
-        fontSize: size * 0.9,
-        fontWeight: 500,
-        letterSpacing: "-0.08em",
-        color: "#000",
-        lineHeight: 1,
-        userSelect: "none",
-      }}
-    >
-      mcx
-    </span>
-  </div>
+  />
 );
 
 export default Logo;
-}
 // ───SUPABASE ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://wrxpyadnllzorrrsiawo.supabase.co";
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRnIMort56my_pwyg1g__epLmUgB";
