@@ -19,7 +19,7 @@ const LOGO_SRC = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAYGBgY
 const Logo=({size=56})=>(
   <img src={LOGO_SRC} alt="MCX" width={size} height={size} style={{objectFit:"contain",display:"block"}}/>
 );
-SUPABASE ─────────────────────────────────────────────────────────────────
+// ───SUPABASE ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://wrxpyadnllzorrrsiawo.supabase.co";
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRnIMort56my_pwyg1g__epLmUgB";
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
