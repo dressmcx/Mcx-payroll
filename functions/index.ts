@@ -1,5 +1,5 @@
-// supabase/functions/send-email/index.ts
-// Deploy with: npx supabase functions deploy send-email
+// supabase/functions/send-sms/index.ts
+// Deploy with: npx supabase functions deploy send-sms
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -12,20 +12,23 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { apiKey, from, to, subject, html } = await req.json();
-    if (!apiKey || !from || !to || !subject || !html) {
+    const { accountSid, authToken, from, to, body } = await req.json();
+    if (!accountSid || !authToken || !from || !to || !body) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const response = await fetch("https://api.resend.com/emails", {
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    const params = new URLSearchParams({ From: from, To: to, Body: body });
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify({ from, to, subject, html }),
+      body: params.toString(),
     });
 
     const data = await response.json();
