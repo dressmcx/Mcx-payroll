@@ -530,16 +530,48 @@ export default function App() {
   };
 
   // Settings handlers
-  const openSettings=()=>{setSettingsDraft({...settings});setPinDraft({current:"",newPin:"",confirm:""});setPinChangeMsg("");setMTab("settings");};
-  const saveSettingsHandler=()=>{const s={...settingsDraft};setSettings(s);saveSettings(s);toast$("✅ Settings saved","success");};
-  const changePinHandler=()=>{
-    if(pinDraft.current!==managerPin){setPinChangeMsg("Current PIN is incorrect.");return;}
-    if(pinDraft.newPin.length!==4||!/^\d{4}$/.test(pinDraft.newPin)){setPinChangeMsg("New PIN must be exactly 4 digits.");return;}
-    if(pinDraft.newPin!==pinDraft.confirm){setPinChangeMsg("PINs do not match.");return;}
-    setManagerPin(pinDraft.newPin);savePin(pinDraft.newPin);
-    setPinDraft({current:"",newPin:"",confirm:""});
-    setPinChangeMsg("✅ PIN updated successfully.");
-    toast$("✅ Manager PIN updated","success");
+  const openSettings = () => {
+    setSettingsDraft({ ...settings });
+    setPinDraft(managerPin || "");
+  };
+
+  const saveSettingsHandler = async () => {
+    const s = { ...settingsDraft };
+    
+    // 1. Update the UI and Local Storage immediately
+    setSettings(s);
+    saveSettings(s);
+
+    // 2. Push the changes to Supabase so they stay after a reload
+    try {
+      const { error } = await sb
+        .from('settings')
+        .update({ 
+          url: s.url, 
+          email: s.email,
+          late_alert: s.lateAlert,
+          // Add any other setting columns you have in your table here
+        })
+        .eq('id', 1); // Assuming your settings row has an ID of 1
+
+      if (error) throw error;
+      toast.success("Settings synced to cloud!");
+    } catch (err) {
+      console.error("Error saving to Supabase:", err);
+      toast.error("Saved locally, but failed to sync to database.");
+    }
+  };
+
+  const changePinHandler = () => {
+    if (!pinDraft || pinDraft.length < 4) {
+      toast.error("Pin must be at least 4 digits");
+      return;
+    }
+    setManagerPin(pinDraft);
+    savePin(pinDraft);
+    setPinDraft("");
+    setChangeMsg("Pin updated successfully");
+    toast.success("Manager PIN updated!");
   };
 
   // ── SCREENS ──────────────────────────────────────────────────────────────────
