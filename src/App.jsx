@@ -37,9 +37,9 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRn
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── STORE GPS ────────────────────────────────────────────────────────────────
-const STORE_LAT    = 25.7617;
-const STORE_LNG    = -80.1918;
-const STORE_RADIUS = 900;
+const STORE_LAT    = 40.700714,;
+const STORE_LNG    = -73.949814;
+const STORE_RADIUS = 200;
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const MANAGER_PIN_KEY = "mcx_manager_pin";
