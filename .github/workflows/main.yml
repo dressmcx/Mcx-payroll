@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-       name: run ls-r
+        name: run ls-r
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -27,4 +27,3 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: $node $GITHUB_WORKSPACE/check-late.js
-.
