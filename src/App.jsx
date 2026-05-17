@@ -39,7 +39,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 // ─── STORE GPS ────────────────────────────────────────────────────────────────
 const STORE_LAT    = 25.7617;
 const STORE_LNG    = -80.1918;
-const STORE_RADIUS = 200;
+const STORE_RADIUS = 900;
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const MANAGER_PIN_KEY = "mcx_manager_pin";
