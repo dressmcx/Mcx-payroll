@@ -21,7 +21,9 @@ jobs:
       - name: Install Dependencies
         run: npm install resend supabase
 
-      - name: Run Late Check Script
+      - name: grant permission
+         run: chmod+×$GITHUB_WORKSPACE/check-late.js
+       - name: Run Late Check Script
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
