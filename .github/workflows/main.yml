@@ -22,7 +22,7 @@ jobs:
         run: npm install resend supabase
 
       - name: Run Late Check Script
-         working-directory./
+         working-directory:./
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
