@@ -37,7 +37,7 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRn
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── STORE GPS ────────────────────────────────────────────────────────────────
-const STORE_LAT    = 40.700706,;
+const STORE_LAT    =  40.700706;
 const STORE_LNG    = -73.949821;
 const STORE_RADIUS = 200;
 
