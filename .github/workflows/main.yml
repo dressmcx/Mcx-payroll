@@ -27,3 +27,4 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: $node $GITHUB_WORKSPACE/check-late.js
+.
