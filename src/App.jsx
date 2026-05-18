@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+Import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRn
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── STORE GPS ────────────────────────────────────────────────────────────────
-const STORE_LAT    =  40.700706;
+const STORE_LAT    = 40.700706;
 const STORE_LNG    = -73.949821;
 const STORE_RADIUS = 200;
 
@@ -227,7 +227,9 @@ const SchedEditor = ({schedule,onChange}) => {
 };
 
 const DateRange = ({from,to,onChange}) => {
+  const [activeFilter, setActiveFilter] = useState(null);
   const set=(days)=>{
+    setActiveFilter(days);
     if(days===null){onChange({from:"",to:""});return;}
     const t=new Date(),s=new Date();
     if(days==="month")s.setDate(1);else s.setDate(t.getDate()-days);
@@ -238,7 +240,7 @@ const DateRange = ({from,to,onChange}) => {
       <div style={{fontSize:11,color:T.faint,fontWeight:700,letterSpacing:1,marginBottom:10}}>DATE RANGE FILTER</div>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
         {[["Today",0],["Last 7 days",6],["Last 30 days",29],["This month","month"],["All time",null]].map(([l,v])=>(
-          <button key={l} onClick={()=>set(v)} style={{padding:"5px 12px",borderRadius:20,border:"none",cursor:"pointer",fontSize:12,fontWeight:600,background:T.border,color:T.muted}}>{l}</button>
+          <button key={l} onClick={()=>set(v)} style={{padding:"5px 12px",borderRadius:20,border:"none",cursor:"pointer",fontSize:12,fontWeight:600,background:activeFilter===v?T.brand:T.border,color:activeFilter===v?"#fff":T.muted,transition:"background .15s,color .15s"}}>{l}</button>
         ))}
       </div>
       <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
@@ -305,6 +307,8 @@ export default function App() {
   const [payNote,    setPayNote]    = useState("");
   const [dateRange,  setDateRange]  = useState({from:"",to:""});
   const [geoState,   setGeoState]   = useState({status:"idle",msg:""});
+  const [logMenu,    setLogMenu]    = useState(null);
+  const [editEntry,  setEditEntry]  = useState(null);
 
   // ── Settings state ──
   const [managerPin,  setManagerPin]  = useState(loadPin);
@@ -529,49 +533,56 @@ export default function App() {
     setSaving(false);
   };
 
-  // Settings handlers
-  const openSettings = () => {
-    setSettingsDraft({ ...settings });
-    setPinDraft(managerPin || "");
+  const saveEditEntry=async()=>{
+    if(!editEntry)return;setSaving(true);
+    const{id,date,inTime,outTime}=editEntry;
+    const updates={clock_in:new Date(`${date}T${inTime}`).toISOString(),clock_out:outTime?new Date(`${date}T${outTime}`).toISOString():null};
+    const{error}=await sb.from("clock_entries").update(updates).eq("id",id);
+    if(error)toast$("Error: "+error.message,"warning");
+    else{await loadAll();setEditEntry(null);toast$("✅ Entry updated","success");}
+    setSaving(false);
   };
 
-  const saveSettingsHandler = async () => {
-    const s = { ...settingsDraft };
-    
-    // 1. Update the UI and Local Storage immediately
+  const deleteEntry=async(eid)=>{
+    if(!window.confirm("Delete this clock entry?"))return;
+    setSaving(true);
+    const{error}=await sb.from("clock_entries").delete().eq("id",eid);
+    if(error)toast$("Error: "+error.message,"warning");
+    else{await loadAll();toast$("Entry deleted","info");}
+    setSaving(false);
+  };
+
+  // Settings handlers
+  const openSettings=()=>{setSettingsDraft({...settings});setPinDraft({current:"",newPin:"",confirm:""});setPinChangeMsg("");setMTab("settings");};
+  const saveSettingsHandler=async(e)=>{
+    if(e&&e.preventDefault)e.preventDefault();
+    const s={...settingsDraft};
     setSettings(s);
     saveSettings(s);
-
-    // 2. Push the changes to Supabase so they stay after a reload
-    try {
-      const { error } = await sb
-        .from('settings')
-        .update({ 
-          url: s.url, 
-          email: s.email,
-          late_alert: s.lateAlert,
-          // Add any other setting columns you have in your table here
-        })
-        .eq('id', 1); // Assuming your settings row has an ID of 1
-
-      if (error) throw error;
-      toast.success("Settings synced to cloud!");
-    } catch (err) {
-      console.error("Error saving to Supabase:", err);
-      toast.error("Saved locally, but failed to sync to database.");
-    }
+    // Persist to Supabase settings table (upsert by key)
+    const fields=[
+      {key:"resendKey",value:s.resendKey||""},
+      {key:"resendFrom",value:s.resendFrom||""},
+      {key:"emailThreshold",value:String(s.emailThreshold||"")},
+      {key:"twilioSid",value:s.twilioSid||""},
+      {key:"twilioToken",value:s.twilioToken||""},
+      {key:"twilioFrom",value:s.twilioFrom||""},
+      {key:"lateThreshold",value:String(s.lateThreshold||"15")},
+      {key:"appUrl",value:s.appUrl||""},
+    ];
+    try{
+      await Promise.all(fields.map(f=>sb.from("settings").upsert({key:f.key,value:f.value},{onConflict:"key"})));
+    }catch(err){console.warn("Settings Supabase save:",err);}
+    toast$("✅ Settings saved","success");
   };
-
-  const changePinHandler = () => {
-    if (!pinDraft || pinDraft.length < 4) {
-      toast.error("Pin must be at least 4 digits");
-      return;
-    }
-    setManagerPin(pinDraft);
-    savePin(pinDraft);
-    setPinDraft("");
-    setChangeMsg("Pin updated successfully");
-    toast.success("Manager PIN updated!");
+  const changePinHandler=()=>{
+    if(pinDraft.current!==managerPin){setPinChangeMsg("Current PIN is incorrect.");return;}
+    if(pinDraft.newPin.length!==4||!/^\d{4}$/.test(pinDraft.newPin)){setPinChangeMsg("New PIN must be exactly 4 digits.");return;}
+    if(pinDraft.newPin!==pinDraft.confirm){setPinChangeMsg("PINs do not match.");return;}
+    setManagerPin(pinDraft.newPin);savePin(pinDraft.newPin);
+    setPinDraft({current:"",newPin:"",confirm:""});
+    setPinChangeMsg("✅ PIN updated successfully.");
+    toast$("✅ Manager PIN updated","success");
   };
 
   // ── SCREENS ──────────────────────────────────────────────────────────────────
@@ -842,7 +853,8 @@ export default function App() {
                   <div key={w.id} style={{background:T.surface,borderRadius:16,border:`1px solid ${T.border}`,overflow:"hidden",marginBottom:16}}>
                     <div style={{padding:"18px 22px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
                       <div><div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700}}>{w.name}</div><div style={{fontSize:12,color:T.faint,marginTop:3}}>{wh.toFixed(2)} hrs · ${w.rate}/hr{(dateRange.from||dateRange.to)?" · filtered":""}</div></div>
-                      <div style={{display:"flex",gap:14,alignItems:"center"}}>
+                      <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
+                        <button onClick={()=>exportCSV({workers:[w],entries:fe.map(e=>({...e,worker_id:w.id})),payments:fp,reminders:reminders.filter(r=>r.workerId===w.id),from:dateRange.from,to:dateRange.to})} style={{padding:"8px 14px",background:T.green,border:"none",borderRadius:8,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:12}}>⬇ Export</button>
                         <div style={{textAlign:"right"}}><div style={{fontSize:11,color:T.faint}}>Balance Due</div><div style={{fontSize:24,fontWeight:700,color:b>0?T.red:"#4ade80"}}>{fmtMoney(b)}</div></div>
                         <button onClick={()=>openPay(w.id)} style={{padding:"11px 22px",background:T.gold,border:"none",borderRadius:10,color:T.dark,fontWeight:700,cursor:"pointer",fontSize:14}}>Pay Worker</button>
                       </div>
@@ -965,10 +977,48 @@ export default function App() {
               {workers.map(w=>{const a=allE(w.id).slice().reverse();if(!a.length)return null;return(
                 <div key={w.id} style={{background:T.surface,borderRadius:14,border:`1px solid ${T.border}`,marginBottom:14,overflow:"hidden"}}>
                   <div style={{padding:"12px 18px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between"}}><span style={{fontFamily:"Georgia,serif",fontWeight:700,fontSize:15}}>{w.name}</span><span style={{fontSize:12,color:T.faint}}>{a.length} entries</span></div>
-                  {a.map((e,i)=>(<div key={i} style={{padding:"10px 18px",borderBottom:`1px solid ${T.dark}`,display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:T.faint}}>{fmtDate(e.clock_in)}</span><span style={{color:"#4ade80"}}>▲ {fmtTime(e.clock_in)}</span><span style={{color:e.clock_out?T.red:T.amber}}>{e.clock_out?`▼ ${fmtTime(e.clock_out)}`:"● Active"}</span><span style={{color:"#888"}}>{e.clock_out?`${((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2)}h`:"…"}</span>{e.manual&&<span style={{color:T.gold,fontSize:11}}>Manual</span>}</div>))}
+                  {a.map((e,i)=>{
+                    const menuOpen=logMenu===e.id;
+                    const dateStr=e.clock_in?new Date(e.clock_in).toISOString().slice(0,10):"";
+                    const inT=e.clock_in?`${pad(new Date(e.clock_in).getHours())}:${pad(new Date(e.clock_in).getMinutes())}`:"";
+                    const outT=e.clock_out?`${pad(new Date(e.clock_out).getHours())}:${pad(new Date(e.clock_out).getMinutes())}`:"";
+                    return(
+                      <div key={e.id||i} style={{position:"relative",padding:"10px 18px",borderBottom:`1px solid ${T.dark}`,display:"flex",justifyContent:"space-between",fontSize:13,alignItems:"center"}}>
+                        {/* Three-dot button — top-front */}
+                        <div style={{position:"absolute",top:6,left:8,zIndex:10}}>
+                          <button onClick={()=>setLogMenu(menuOpen?null:e.id)} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:18,padding:"2px 6px",borderRadius:6,lineHeight:1}} title="Options">⋮</button>
+                          {menuOpen&&(
+                            <div style={{position:"absolute",top:"100%",left:0,background:T.surface,border:`1px solid ${T.borderHi}`,borderRadius:10,boxShadow:"0 8px 24px rgba(0,0,0,.5)",zIndex:200,minWidth:120,overflow:"hidden"}}>
+                              <button onClick={()=>{setEditEntry({id:e.id,workerId:w.id,date:dateStr,inTime:inT,outTime:outT});setLogMenu(null);}} style={{width:"100%",padding:"10px 16px",background:"none",border:"none",color:"#fff",cursor:"pointer",textAlign:"left",fontSize:13,display:"flex",alignItems:"center",gap:8}}>✏️ Edit</button>
+                              <button onClick={()=>{setLogMenu(null);deleteEntry(e.id);}} style={{width:"100%",padding:"10px 16px",background:"none",border:"none",color:T.red,cursor:"pointer",textAlign:"left",fontSize:13,display:"flex",alignItems:"center",gap:8}}>🗑 Delete</button>
+                            </div>
+                          )}
+                        </div>
+                        <span style={{color:T.faint,paddingLeft:28}}>{fmtDate(e.clock_in)}</span>
+                        <span style={{color:"#4ade80"}}>▲ {fmtTime(e.clock_in)}</span>
+                        <span style={{color:e.clock_out?T.red:T.amber}}>{e.clock_out?`▼ ${fmtTime(e.clock_out)}`:"● Active"}</span>
+                        <span style={{color:"#888"}}>{e.clock_out?`${((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2)}h`:"…"}</span>
+                        {e.manual&&<span style={{color:T.gold,fontSize:11}}>Manual</span>}
+                      </div>
+                    );
+                  })}
                 </div>
               );})}
-            </div>
+              {/* Edit Entry Modal */}
+              {editEntry&&(
+                <div style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(0,0,0,.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+                  <div style={{background:T.surface,borderRadius:16,width:"100%",maxWidth:420,border:`1px solid ${T.gold}`,padding:24}}>
+                    <h3 style={{margin:"0 0 16px",color:T.gold,fontFamily:"Georgia,serif"}}>Edit Clock Entry</h3>
+                    {[["Date","date","date"],["Clock In","inTime","time"],["Clock Out (optional)","outTime","time"]].map(([label,field,type])=>(
+                      <div key={field} style={{marginBottom:12}}><label style={{fontSize:12,color:T.faint,display:"block",marginBottom:4}}>{label}</label><input type={type} value={editEntry[field]||""} onChange={ev=>setEditEntry(p=>({...p,[field]:ev.target.value}))} style={inp()}/></div>
+                    ))}
+                    <div style={{display:"flex",gap:8,marginTop:16}}>
+                      <button onClick={saveEditEntry} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Saving…":"Save Changes"}</button>
+                      <button onClick={()=>setEditEntry(null)} style={{flex:1,padding:"9px",background:T.border,border:"none",borderRadius:8,color:"#888",cursor:"pointer"}}>Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              )}            </div>
           )}
 
           {/* SCHEDULE */}
@@ -994,7 +1044,6 @@ export default function App() {
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18,flexWrap:"wrap",gap:10}}>
                 <h2 style={{fontFamily:"Georgia,serif",fontSize:22,margin:0}}>Alerts & Reminders</h2>
                 <div style={{display:"flex",gap:10}}>
-                  <button onClick={()=>exportCSV({workers,entries,payments,reminders,from:dateRange.from,to:dateRange.to})} style={{padding:"9px 18px",background:T.green,border:"none",borderRadius:8,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13}}>⬇ Export to Excel</button>
                   {reminders.length>0&&<button onClick={()=>setReminders([])} style={{background:T.border,border:"none",color:"#888",padding:"9px 14px",borderRadius:8,cursor:"pointer",fontSize:13}}>Clear All</button>}
                 </div>
               </div>
@@ -1076,14 +1125,6 @@ export default function App() {
                 <button onClick={saveSettingsHandler} style={{flex:1,padding:"13px",background:T.gold,border:"none",borderRadius:10,fontWeight:700,cursor:"pointer",color:T.dark,fontSize:15}}>✓ Save Settings</button>
                 <button onClick={()=>setSettingsDraft({...settings})} style={{padding:"13px 20px",background:T.border,border:"none",borderRadius:10,color:"#888",cursor:"pointer",fontSize:14}}>Discard</button>
               </div>
-
-              {/* Deployment note */}
-              <div style={{marginTop:14,padding:"14px 18px",background:T.amberBg,border:`1px solid #3a2800`,borderRadius:10,fontSize:13,color:T.amber,lineHeight:1.8}}>
-                <div style={{fontWeight:700,marginBottom:6}}>⚠️ How SMS & Email work</div>
-                <div style={{fontSize:12,color:"#c9860a",lineHeight:1.7}}>
-                  Sending requires two <strong>Supabase Edge Functions</strong> in your project: <code style={{background:"rgba(0,0,0,.2)",padding:"1px 5px",borderRadius:4}}>send-sms</code> and <code style={{background:"rgba(0,0,0,.2)",padding:"1px 5px",borderRadius:4}}>send-email</code>. The <strong>README.md</strong> included in the zip file has copy-paste instructions. Settings are saved in this browser only.
-                </div>
-              </div>
             </div>
           )}
 
@@ -1092,4 +1133,4 @@ export default function App() {
     );
   }
   return null;
-}
+  }
