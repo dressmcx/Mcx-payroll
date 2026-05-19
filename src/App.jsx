@@ -166,7 +166,7 @@ const paymentEmailHtml = (workerName, amount, methods, note, appUrl="") => {
   const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
   const url=URL.createObjectURL(blob);
-  object.assign(document.createElement("a"),{href:url,download:`MCX_Payroll_${label}.csv`}).click();
+  Object.assign(document.createElement("a"),{href:url,download:`MCX_Payroll_${label}.csv`}).click();
   URL.revokeObjectURL(url);
 };  
 
