@@ -140,7 +140,7 @@ const paymentEmailHtml = (workerName, amount, methods, note, appUrl="") => {
 };
 
 // ─── CSV EXPORT ───────────────────────────────────────────────────────────────
- const exportCSV = ({workers,entries,payments,reminders,from,to}) => {
+  const exportCSV = ({workers,entries,payments,reminders,from,to}) => {
   const inRange=ts=>{const d=new Date(ts);if(from&&d<new Date(from+"T00:00:00"))return false;if(to&&d>new Date(to+"T23:59:59"))return false;return true;};
   const label=from&&to?`${from}_to_${to}`:new Date().toISOString().slice(0,10);
   const rows=[["Worker","Date","Check-in","Check-out","Hours","Rate","Gross Pay","Paid","Balance","Schedule","Methods","Check #s","Alert","Alert Time"]];
