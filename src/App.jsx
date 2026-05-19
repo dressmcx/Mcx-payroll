@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+)import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // ─── THEME ────────────────────────────────────────────────────────────────────
@@ -143,26 +143,32 @@ const paymentEmailHtml = (workerName, amount, methods, note, appUrl="") => {
   const exportCSV = ({workers,entries,payments,reminders,from,to}) => {
   const inRange=ts=>{const d=new Date(ts);if(from&&d<new Date(from+"T00:00:00"))return false;if(to&&d>new Date(to+"T23:59:59"))return false;return true;};
   const label=from&&to?`${from}_to_${to}`:new Date().toISOString().slice(0,10);
-  const rows=[["Worker","Check-in","Check-out","Hours","Rate","Gross Pay","Paid","Balance","Schedule","Methods","Check #s","Alert","Alert Time"]];
+  const rows=[["Worker","Date","Check-in","Check-out","Hours","Rate","Gross Pay","Paid","Balance","Schedule","Methods","Check #s","Alert","Alert Time"]];
   workers.forEach(w=>{
     const we=entries.filter(e=>e.worker_id===w.id&&inRange(e.clock_in));
     const wp=payments.filter(p=>p.worker_id===w.id&&inRange(p.paid_at));
-    const hrs=hoursFrom(we),gross=hrs*w.rate,paid=wp.reduce((s,p)=>s+Number(p.amount),0),bal=Math.max(0,gross-paid);
+    const totalHrs=hoursFrom(we),gross=totalHrs*w.rate,paid=wp.reduce((s,p)=>s+Number(p.amount),0),bal=Math.max(0,gross-paid);
     const methods=wp.flatMap(p=>(p.methods||[]).map(m=>`${m.method} ${fmtMoney(m.amount)}`)).join(" | ");
     const checks=wp.flatMap(p=>(p.methods||[]).filter(m=>m.method==="Check"&&m.checkNumber).map(m=>`#${m.checkNumber}`)).join(", ");
     const alerts=reminders.filter(r=>r.workerId===w.id);
-    // Earliest check-in and latest check-out in range for this worker
-    const checkIn=we.length?fmtTime(we.reduce((a,e)=>new Date(e.clock_in)<new Date(a.clock_in)?e:a).clock_in):"—";
-    const checkOut=we.filter(e=>e.clock_out).length?fmtTime(we.filter(e=>e.clock_out).reduce((a,e)=>new Date(e.clock_out)>new Date(a.clock_out)?e:a).clock_out):"—";
-    (alerts.length?alerts:[null]).forEach((a,i)=>{rows.push([i===0?w.name:"",i===0?checkIn:"",i===0?checkOut:"",i===0?hrs.toFixed(2):"",i===0?w.rate:"",i===0?fmtMoney(gross):"",i===0?fmtMoney(paid):"",i===0?fmtMoney(bal):"",i===0?schedSummary(getSched(w)):"",i===0?methods:"",i===0?checks:"",a?a.msg:"",a?`${fmtDate(a.ts)} ${fmtTime(a.ts)}`:""])});
-    rows.push(new Array(13).fill(""));
+    // One row per clock entry
+    we.forEach((e,i)=>{
+      const entryHrs=e.clock_out?((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2):"—";
+      const dateStr=fmtDate(e.clock_in);
+      const inStr=fmtTime(e.clock_in);
+      const outStr=e.clock_out?fmtTime(e.clock_out):"Active";
+      const a=alerts[i]||null;
+      rows.push([i===0?w.name:"",dateStr,inStr,outStr,entryHrs,i===0?w.rate:"",i===0?fmtMoney(gross):"",i===0?fmtMoney(paid):"",i===0?fmtMoney(bal):"",i===0?schedSummary(getSched(w)):"",i===0?methods:"",i===0?checks:"",a?a.msg:"",a?`${fmtDate(a.ts)} ${fmtTime(a.ts)}`:""]);
+    });
+    if(!we.length)rows.push([w.name,"—","—","—","0","","","","","","","","",""]);
+    rows.push(new Array(14).fill(""));
   });
   const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
   const url=URL.createObjectURL(blob);
   Object.assign(document.createElement("a"),{href:url,download:`MCX_Payroll_${label}.csv`}).click();
   URL.revokeObjectURL(url);
-};
+};  
 
 // ─── SHARED UI ────────────────────────────────────────────────────────────────
 const ClockFace = ({now,dark=false}) => {
