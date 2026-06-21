@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";q
+aimport { useState, useEffect, useRef, useCallback } from "react";q
 import { supabase } from "./supabaseClient";
 
 // ─────────────────────────────────────────────────────────────
