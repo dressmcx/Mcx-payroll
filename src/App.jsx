@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-// â”€â”€â”€ THEME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── THEME ────────────────────────────────────────────────────────────────────
 const T = {
   brand:"#956342", brandDark:"#7a4f32",
   gold:"#c9a96e", dark:"#0f0a07", surface:"#1a1008", surfaceAlt:"#150d06",
@@ -13,7 +13,7 @@ const T = {
   blue:"#3b82f6",
 };
 
-// â”€â”€â”€ LOGO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LOGO ─────────────────────────────────────────────────────────────────────
 // logo.png lives in /public/logo.png in your repo.
 // It is rendered with no background wrapper anywhere in the app.
 const Logo = ({ size = 56 }) => (
@@ -26,22 +26,22 @@ const Logo = ({ size = 56 }) => (
       objectFit: "contain",
       display:   "block",
       background:"transparent",
-      // no border, no shadow, no wrapper â€” transparent PNG shows through
+      // no border, no shadow, no wrapper — transparent PNG shows through
     }}
   />
 );
 
-// â”€â”€â”€ SUPABASE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SUPABASE ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://wrxpyadnllzorrrsiawo.supabase.co";
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || "sb_publishable_2rrfRnIMort56my_pwyg1g__epLmUgB";
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// â”€â”€â”€ STORE GPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── STORE GPS ────────────────────────────────────────────────────────────────
 const STORE_LAT    = 40.700706;
 const STORE_LNG    = -73.949821;
 const STORE_RADIUS = 200;
 
-// â”€â”€â”€ CONSTANTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const MANAGER_PIN_KEY = "mcx_manager_pin";
 const SETTINGS_KEY    = "mcx_settings";
 const PAY_METHODS  = ["Cash","Check","Zelle","Store Credit"];
@@ -64,24 +64,24 @@ const saveSettings = s => localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
 const loadPin = () => localStorage.getItem(MANAGER_PIN_KEY) || "0000";
 const savePin = p => localStorage.setItem(MANAGER_PIN_KEY, p);
 
-// â”€â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
 const pad       = n => String(n).padStart(2,"0");
 const fmtMoney  = n => `$${Number(n||0).toFixed(2)}`;
-const fmtTime   = ts => { if(!ts)return"â€”"; const d=new Date(ts); let h=d.getHours(),m=d.getMinutes(),ap=h>=12?"PM":"AM"; h=h%12||12; return`${h}:${pad(m)} ${ap}`; };
+const fmtTime   = ts => { if(!ts)return"—"; const d=new Date(ts); let h=d.getHours(),m=d.getMinutes(),ap=h>=12?"PM":"AM"; h=h%12||12; return`${h}:${pad(m)} ${ap}`; };
 const fmtDate   = ts => { if(!ts)return""; const d=new Date(ts); return`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; };
 const fmt24     = t  => { if(!t)return""; const[h,m]=t.split(":").map(Number); return`${h%12||12}:${pad(m)} ${h>=12?"PM":"AM"}`; };
 const hoursFrom = list => { let t=0; for(const e of list) if(e.clock_in&&e.clock_out) t+=(new Date(e.clock_out)-new Date(e.clock_in))/3600000; return t; };
 const isToday   = ts => { const d=new Date(ts),n=new Date(); return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear(); };
 const getSched  = w  => { if(!w.schedule)return DEFAULT_SCHED; return typeof w.schedule==="string"?JSON.parse(w.schedule):w.schedule; };
-const schedSummary = s => { const active=DAYS.filter(d=>s?.[d]?.active); if(!active.length)return"No scheduled days"; const names=active.map(d=>d.slice(0,3)).join(", "); const times=active.map(d=>`${fmt24(s[d].start)}â€“${fmt24(s[d].end)}`); return times.every(t=>t===times[0])?`${names}  ${times[0]}`:`${names} (varied)`; };
+const schedSummary = s => { const active=DAYS.filter(d=>s?.[d]?.active); if(!active.length)return"No scheduled days"; const names=active.map(d=>d.slice(0,3)).join(", "); const times=active.map(d=>`${fmt24(s[d].start)}–${fmt24(s[d].end)}`); return times.every(t=>t===times[0])?`${names}  ${times[0]}`:`${names} (varied)`; };
 const geoDist   = (la1,ln1,la2,ln2) => { const R=6371000,dL=(la2-la1)*Math.PI/180,dN=(ln2-ln1)*Math.PI/180; const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dN/2)**2; return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); };
 const useNow    = () => { const[n,s]=useState(new Date()); useEffect(()=>{const id=setInterval(()=>s(new Date()),1000);return()=>clearInterval(id);},[]);return n; };
 
-// â”€â”€â”€ WEEKLY HELPERS (Sunâ€“Fri cycle) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── WEEKLY HELPERS (Sun–Fri cycle) ───────────────────────────────────────────
 // Returns the Sunday that starts the week containing `date`
 const getWeekSunday = date => {
   const d = new Date(date);
-  const day = d.getDay(); // 0=Sun â€¦ 6=Sat
+  const day = d.getDay(); // 0=Sun … 6=Sat
   // If Saturday, roll to next Sunday (Saturday is NOT in this week)
   if (day === 6) {
     d.setDate(d.getDate() + 1);
@@ -151,7 +151,7 @@ const buildWorkerWeeks = (workerEntries, workerPayments) => {
 
 const fmtDateSlash = d => `${pad(d.getMonth()+1)}/${pad(d.getDate())}/${d.getFullYear()}`;
 
-// â”€â”€â”€ NOTIFICATION HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── NOTIFICATION HELPERS ─────────────────────────────────────────────────────
 // These call your Supabase Edge Functions (see README for deployment)
 const sendSMS = async (settings, to, body) => {
   if (!settings.twilioSid || !settings.twilioToken || !settings.twilioFrom || !to) return;
@@ -208,12 +208,12 @@ const paymentEmailHtml = (workerName, amount, methods, note, appUrl="") => {
     ${note?`<p style="color:#999;font-size:13px;margin-top:14px;font-style:italic;line-height:1.5">${note}</p>`:""}
   </div>
   <div style="padding:14px 32px;background:#f9f5f0;text-align:center;font-size:12px;color:#bbb;border-top:1px solid #ece8e0">
-    MCX Payroll System &nbsp;Â·&nbsp; This is an automated message
+    MCX Payroll System &nbsp;·&nbsp; This is an automated message
   </div>
 </div></body></html>`;
 };
 
-// â”€â”€â”€ EXCEL (CSV) EXPORT â€” Weekly Breakdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── EXCEL (CSV) EXPORT — Weekly Breakdown ────────────────────────────────────
 const exportCSV = ({workers, entries, payments, reminders, from, to}) => {
   const inRange = ts => {
     const d = new Date(ts);
@@ -231,7 +231,7 @@ const exportCSV = ({workers, entries, payments, reminders, from, to}) => {
 
     // Worker header
     rows.push([`WORKER: ${w.name}`, `Rate: $${w.rate}/hr`, `Schedule: ${schedSummary(getSched(w))}`, "", "", "", ""]);
-    rows.push(["Week", "Period (Sunâ€“Fri)", "Hours Worked", "Hours Paid", "Total $ Paid", "Payment Methods", "Notes"]);
+    rows.push(["Week", "Period (Sun–Fri)", "Hours Worked", "Hours Paid", "Total $ Paid", "Payment Methods", "Notes"]);
 
     const weeks = buildWorkerWeeks(we, wp);
     let weekNum = 1;
@@ -247,11 +247,11 @@ const exportCSV = ({workers, entries, payments, reminders, from, to}) => {
 
       rows.push([
         `Week ${weekNum}`,
-        `${fmtDateSlash(wk.sunday)} â€“ ${fmtDateSlash(new Date(wk.sunday.getTime() + 5 * 86400000))}`,
+        `${fmtDateSlash(wk.sunday)} – ${fmtDateSlash(new Date(wk.sunday.getTime() + 5 * 86400000))}`,
         wkHrsWorked.toFixed(2),
         wkHrsPaid.toFixed(2),
         fmtMoney(wkPaid),
-        methods || "â€”",
+        methods || "—",
         notes || "",
       ]);
 
@@ -288,7 +288,7 @@ const exportCSV = ({workers, entries, payments, reminders, from, to}) => {
   URL.revokeObjectURL(url);
 };
 
-// â”€â”€â”€ SHARED UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── SHARED UI ────────────────────────────────────────────────────────────────
 const ClockFace = ({now,dark=false}) => {
   const days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const mos=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -309,7 +309,7 @@ const Toast = ({msg,type,onClose}) => {
   const bg=type==="success"?T.green:type==="warning"?"#92400e":"#1e3a8a";
   return(
     <div style={{position:"fixed",top:20,right:20,zIndex:9999,background:bg,color:"#fff",padding:"14px 20px",borderRadius:12,maxWidth:360,boxShadow:"0 8px 32px rgba(0,0,0,.5)",fontSize:14,lineHeight:1.6,animation:"toastIn .3s ease"}}>
-      {msg}<button onClick={onClose} style={{marginLeft:12,background:"none",border:"none",color:"rgba(255,255,255,.6)",cursor:"pointer",fontSize:16}}>âœ•</button>
+      {msg}<button onClick={onClose} style={{marginLeft:12,background:"none",border:"none",color:"rgba(255,255,255,.6)",cursor:"pointer",fontSize:16}}>✕</button>
     </div>
   );
 };
@@ -318,7 +318,7 @@ const Spinner = () => (
   <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh",background:T.brand,flexDirection:"column",gap:16}}>
     <Logo size={80}/>
     <div style={{width:36,height:36,border:`3px solid ${T.brandDark}`,borderTop:`3px solid ${T.gold}`,borderRadius:"50%",animation:"spin 1s linear infinite"}}/>
-    <div style={{color:"rgba(255,255,255,.5)",fontSize:13,letterSpacing:2}}>LOADINGâ€¦</div>
+    <div style={{color:"rgba(255,255,255,.5)",fontSize:13,letterSpacing:2}}>LOADING…</div>
   </div>
 );
 
@@ -378,7 +378,7 @@ const DateRange = ({from,to,onChange}) => {
           </div>
         ))}
       </div>
-      {(from||to)&&<div style={{fontSize:12,color:T.gold,marginTop:8}}>Showing: {from?fmtDate(from+"T12:00:00"):"start"} â†’ {to?fmtDate(to+"T12:00:00"):"now"}</div>}
+      {(from||to)&&<div style={{fontSize:12,color:T.gold,marginTop:8}}>Showing: {from?fmtDate(from+"T12:00:00"):"start"} → {to?fmtDate(to+"T12:00:00"):"now"}</div>}
     </div>
   );
 };
@@ -402,7 +402,7 @@ const SettingsField = ({label,hint,children}) => (
   </div>
 );
 
-// â”€â”€â”€ MAIN APP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const now = useNow();
 
@@ -438,7 +438,7 @@ export default function App() {
   const [logMenu,    setLogMenu]    = useState(null);
   const [editEntry,  setEditEntry]  = useState(null);
 
-  // â”€â”€ Settings state â”€â”€
+  // ── Settings state ──
   const [managerPin,  setManagerPin]  = useState(loadPin);
   const [settings,    setSettings]    = useState(loadSettings);
   const [settingsDraft, setSettingsDraft] = useState({});
@@ -484,22 +484,22 @@ export default function App() {
       // Late clock-in alert
       if(h===sh&&m===(sm+threshold)%60&&s===0){
         if(!entries.filter(e=>e.worker_id===w.id&&isToday(e.clock_in)).some(e=>!e.clock_out)){
-          const msg=`â° ${w.name} hasn't clocked in! Shift started at ${fmt24(ds.start)}.`;
+          const msg=`⏰ ${w.name} hasn't clocked in! Shift started at ${fmt24(ds.start)}.`;
           setReminders(r=>[...r,{id:Date.now()+w.id,workerId:w.id,msg,ts:Date.now()}]);
           toast$(msg,"warning");
           // SMS
           if(w.phone)sendSMS(settings,w.phone,msg);
           // Email
-          if(w.email)sendEmail(settings,w.email,"â° Late Clock-In Alert",`<p>${msg}</p>`);
+          if(w.email)sendEmail(settings,w.email,"⏰ Late Clock-In Alert",`<p>${msg}</p>`);
         }
       }
       // Forgot to clock out
       if(h===eh&&m===em&&s===0&&entries.find(e=>e.worker_id===w.id&&isToday(e.clock_in)&&!e.clock_out)){
-        const msg=`ðŸ”” ${w.name} is still clocked in after shift end!`;
+        const msg=`🔔 ${w.name} is still clocked in after shift end!`;
         setReminders(r=>[...r,{id:Date.now()+w.id+1,workerId:w.id,msg,ts:Date.now()}]);
         toast$(msg,"warning");
         if(w.phone)sendSMS(settings,w.phone,msg);
-        if(w.email)sendEmail(settings,w.email,"ðŸ”” Shift End Reminder",`<p>${msg}</p>`);
+        if(w.email)sendEmail(settings,w.email,"🔔 Shift End Reminder",`<p>${msg}</p>`);
       }
     });
   },[now]);
@@ -522,17 +522,17 @@ export default function App() {
     const w=workers.find(x=>x.id===wid);
     if(w?.geo_bypass){await doClock(wid);return;}
     if(!navigator.geolocation){toast$("Geolocation not supported.","warning");return;}
-    setGeoState({status:"checking",msg:"Checking your locationâ€¦"});
+    setGeoState({status:"checking",msg:"Checking your location…"});
     navigator.geolocation.getCurrentPosition(
       async pos=>{
         const dist=geoDist(pos.coords.latitude,pos.coords.longitude,STORE_LAT,STORE_LNG);
         if(dist<=STORE_RADIUS){
-          setGeoState({status:"ok",msg:`âœ… Location verified (${Math.round(dist)}m)`});
+          setGeoState({status:"ok",msg:`✅ Location verified (${Math.round(dist)}m)`});
           await doClock(wid);
           setTimeout(()=>setGeoState({status:"idle",msg:""}),3000);
         }else{
-          setGeoState({status:"far",msg:`ðŸ“ ${Math.round(dist)}m away. Must be within ${STORE_RADIUS}m.`});
-          toast$(`âŒ Too far from store (${Math.round(dist)}m).`,"warning");
+          setGeoState({status:"far",msg:`📍 ${Math.round(dist)}m away. Must be within ${STORE_RADIUS}m.`});
+          toast$(`❌ Too far from store (${Math.round(dist)}m).`,"warning");
         }
       },
       ()=>{setGeoState({status:"denied",msg:"Location access denied."});toast$("Location access denied.","warning");},
@@ -544,7 +544,7 @@ export default function App() {
     setSaving(true);
     const{error}=await sb.from("clock_entries").insert({worker_id:wid,clock_in:new Date().toISOString(),clock_out:null,note:"",manual:false});
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();toast$(`âœ… ${workers.find(w=>w.id===wid)?.name} clocked IN`,"success");}
+    else{await loadAll();toast$(`✅ ${workers.find(w=>w.id===wid)?.name} clocked IN`,"success");}
     setSaving(false);
   };
   const clockOut=async wid=>{
@@ -552,7 +552,7 @@ export default function App() {
     const a=todayE(wid).find(e=>!e.clock_out);if(!a){setSaving(false);return;}
     const{error}=await sb.from("clock_entries").update({clock_out:new Date().toISOString()}).eq("id",a.id);
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();toast$(`ðŸ”´ ${workers.find(w=>w.id===wid)?.name} clocked OUT`,"info");}
+    else{await loadAll();toast$(`🔴 ${workers.find(w=>w.id===wid)?.name} clocked OUT`,"info");}
     setSaving(false);
   };
 
@@ -580,14 +580,14 @@ export default function App() {
     setSaving(true);
     const{error}=await sb.from("workers").insert({name:newW.name,pin:newW.pin,rate:Number(newW.rate),email:newW.email,phone:newW.phone,geo_bypass:!!newW.geo_bypass,schedule:JSON.stringify(newWSched)});
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();setAddingW(false);toast$(`âœ… ${newW.name} added`,"success");}
+    else{await loadAll();setAddingW(false);toast$(`✅ ${newW.name} added`,"success");}
     setSaving(false);
   };
   const saveEdit=async wid=>{
     setSaving(true);
     const{error}=await sb.from("workers").update({name:editForm.name,pin:editForm.pin,rate:Number(editForm.rate),email:editForm.email,phone:editForm.phone,geo_bypass:!!editForm.geo_bypass,schedule:JSON.stringify(editSched||DEFAULT_SCHED)}).eq("id",wid);
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();setEditWid(null);setEditSched(null);toast$("âœ… Worker updated","success");}
+    else{await loadAll();setEditWid(null);setEditSched(null);toast$("✅ Worker updated","success");}
     setSaving(false);
   };
   const deleteW=async(wid,name)=>{
@@ -602,7 +602,7 @@ export default function App() {
     setSaving(true);
     const{error}=await sb.from("workers").update({schedule:JSON.stringify(schDraft)}).eq("id",wid);
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();setExpandSch(null);toast$("âœ… Schedule saved","success");}
+    else{await loadAll();setExpandSch(null);toast$("✅ Schedule saved","success");}
     setSaving(false);
   };
 
@@ -629,7 +629,7 @@ export default function App() {
     const{workerId}=payModal;
     const w=workers.find(x=>x.id===workerId);
 
-    // â”€â”€ Hour-boundary check â”€â”€
+    // ── Hour-boundary check ──
     const needed = validateHours(total, w.rate);
     if (needed !== null) {
       setPayHourAlert({needed: parseFloat(needed.toFixed(2))});
@@ -643,22 +643,22 @@ export default function App() {
     if(error){toast$("Error: "+error.message,"warning");setSaving(false);return;}
     await loadAll();
 
-    // â”€â”€ Auto email payment confirmation â”€â”€
+    // ── Auto email payment confirmation ──
     if(w?.email){
       await sendEmail(
         settings,
         w.email,
-        `ðŸ’µ MCX Payment Confirmation â€” ${fmtMoney(total)}`,
+        `💵 MCX Payment Confirmation — ${fmtMoney(total)}`,
         paymentEmailHtml(w.name,total,methods,payNote,settings.appUrl||"")
       );
     }
-    // â”€â”€ Optional SMS confirmation â”€â”€
+    // ── Optional SMS confirmation ──
     if(w?.phone){
       const methodStr=methods.map(m=>`${m.method} ${fmtMoney(m.amount)}`).join(", ");
       await sendSMS(settings,w.phone,`MCX: Payment of ${fmtMoney(total)} recorded for ${w.name}. Methods: ${methodStr}.`);
     }
 
-    toast$(`âœ… Payment of ${fmtMoney(total)} recorded${w?.email?" Â· Confirmation email sent":""}`,  "success");
+    toast$(`✅ Payment of ${fmtMoney(total)} recorded${w?.email?" · Confirmation email sent":""}`,  "success");
     setPayModal(null);
     setPayHourAlert(null);
     setSaving(false);
@@ -678,7 +678,7 @@ export default function App() {
     const{workerId,date,inTime,outTime}=manEntry;
     const{error}=await sb.from("clock_entries").insert({worker_id:workerId,clock_in:new Date(`${date}T${inTime}`).toISOString(),clock_out:outTime?new Date(`${date}T${outTime}`).toISOString():null,note:"Manual entry",manual:true});
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();setManEntry(null);toast$("âœ… Manual entry saved","success");}
+    else{await loadAll();setManEntry(null);toast$("✅ Manual entry saved","success");}
     setSaving(false);
   };
 
@@ -688,7 +688,7 @@ export default function App() {
     const updates={clock_in:new Date(`${date}T${inTime}`).toISOString(),clock_out:outTime?new Date(`${date}T${outTime}`).toISOString():null};
     const{error}=await sb.from("clock_entries").update(updates).eq("id",id);
     if(error)toast$("Error: "+error.message,"warning");
-    else{await loadAll();setEditEntry(null);toast$("âœ… Entry updated","success");}
+    else{await loadAll();setEditEntry(null);toast$("✅ Entry updated","success");}
     setSaving(false);
   };
 
@@ -722,7 +722,7 @@ export default function App() {
     try{
       await Promise.all(fields.map(f=>sb.from("settings").upsert({key:f.key,value:f.value},{onConflict:"key"})));
     }catch(err){console.warn("Settings Supabase save:",err);}
-    toast$("âœ… Settings saved","success");
+    toast$("✅ Settings saved","success");
   };
   const changePinHandler=()=>{
     if(pinDraft.current!==managerPin){setPinChangeMsg("Current PIN is incorrect.");return;}
@@ -730,11 +730,11 @@ export default function App() {
     if(pinDraft.newPin!==pinDraft.confirm){setPinChangeMsg("PINs do not match.");return;}
     setManagerPin(pinDraft.newPin);savePin(pinDraft.newPin);
     setPinDraft({current:"",newPin:"",confirm:""});
-    setPinChangeMsg("âœ… PIN updated successfully.");
-    toast$("âœ… Manager PIN updated","success");
+    setPinChangeMsg("✅ PIN updated successfully.");
+    toast$("✅ Manager PIN updated","success");
   };
 
-  // â”€â”€ SCREENS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── SCREENS ──────────────────────────────────────────────────────────────────
 
   if(screen==="splash")return(
     <div style={{minHeight:"100vh",background:T.brand,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:18,opacity:splashOut?0:1,transition:"opacity .6s ease"}}>
@@ -751,16 +751,16 @@ export default function App() {
   if(screen==="pin")return(
     <div style={{minHeight:"100vh",background:"#f8f6f2",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative"}}>
       <style>{CSS}</style>
-      <button onClick={()=>{setScreen("home");setPinBuf("");setPinErr("");setGeoState({status:"idle",msg:""}); }} style={{position:"absolute",top:24,left:24,background:"none",border:"none",cursor:"pointer",fontSize:22,color:"#bbb"}}>â†</button>
+      <button onClick={()=>{setScreen("home");setPinBuf("");setPinErr("");setGeoState({status:"idle",msg:""}); }} style={{position:"absolute",top:24,left:24,background:"none",border:"none",cursor:"pointer",fontSize:22,color:"#bbb"}}>←</button>
       <Logo size={64}/>
       <h2 style={{fontFamily:"Georgia,serif",fontSize:24,margin:"14px 0 4px",color:"#0a0a0a"}}>{pinTarget==="manager"?"Manager Login":workers.find(w=>w.id===pinTarget)?.name}</h2>
       <p style={{color:"#aaa",fontSize:13,marginBottom:24}}>{pinTarget==="manager"?"Enter manager PIN":"Enter your 4-digit PIN"}</p>
       <div style={{display:"flex",gap:14,marginBottom:24}}>{[0,1,2,3].map(i=><div key={i} style={{width:18,height:18,borderRadius:"50%",background:i<pinBuf.length?"#0a0a0a":"#ddd",transition:"background .15s"}}/>)}</div>
       {pinErr&&<div style={{color:T.red,fontSize:13,marginBottom:12,background:"#fef2f2",padding:"6px 16px",borderRadius:6}}>{pinErr}</div>}
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,width:240}}>
-        {[1,2,3,4,5,6,7,8,9,"",0,"âŒ«"].map((d,i)=>(
-          <button key={i} onClick={()=>{if(d==="âŒ«"){setPinBuf(p=>p.slice(0,-1));setPinErr("");}else if(d!=="")handlePin(String(d));}} disabled={d===""}
-            style={{height:64,borderRadius:12,border:"none",background:d===""?"transparent":d==="âŒ«"?"#f0ece4":"#fff",color:"#0a0a0a",fontSize:22,fontWeight:600,cursor:d===""?"default":"pointer",boxShadow:d===""||d==="âŒ«"?"none":"0 2px 10px rgba(0,0,0,.08)"}}>{d}</button>
+        {[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((d,i)=>(
+          <button key={i} onClick={()=>{if(d==="⌫"){setPinBuf(p=>p.slice(0,-1));setPinErr("");}else if(d!=="")handlePin(String(d));}} disabled={d===""}
+            style={{height:64,borderRadius:12,border:"none",background:d===""?"transparent":d==="⌫"?"#f0ece4":"#fff",color:"#0a0a0a",fontSize:22,fontWeight:600,cursor:d===""?"default":"pointer",boxShadow:d===""||d==="⌫"?"none":"0 2px 10px rgba(0,0,0,.08)"}}>{d}</button>
         ))}
       </div>
     </div>
@@ -787,11 +787,11 @@ export default function App() {
                   <div style={{width:44,height:44,borderRadius:"50%",background:isin?"#dcfce7":"#f3f0ea",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:700,color:isin?T.green:"#999"}}>{w.name.split(" ").map(n=>n[0]).join("")}</div>
                   <div style={{textAlign:"left"}}>
                     <div style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:700,color:"#0a0a0a"}}>{w.name}</div>
-                    <div style={{fontSize:12,color:isin?T.green:"#ccc",marginTop:2}}>{isin?`â— Clocked In Â· ${th.toFixed(1)}h today`:"Not clocked in"}</div>
+                    <div style={{fontSize:12,color:isin?T.green:"#ccc",marginTop:2}}>{isin?`● Clocked In · ${th.toFixed(1)}h today`:"Not clocked in"}</div>
                   </div>
                 </div>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
-                  {w.geo_bypass&&<span style={{fontSize:10,color:T.amber,background:T.amberBg,padding:"2px 7px",borderRadius:10,fontWeight:700}}>ðŸ  Remote</span>}
+                  {w.geo_bypass&&<span style={{fontSize:10,color:T.amber,background:T.amberBg,padding:"2px 7px",borderRadius:10,fontWeight:700}}>🏠 Remote</span>}
                   <div style={{padding:"5px 13px",borderRadius:20,fontSize:11,fontWeight:700,letterSpacing:.5,background:isin?T.green:"#f0ece4",color:isin?"#fff":"#aaa"}}>{isin?"IN":"OUT"}</div>
                 </div>
               </button>
@@ -812,13 +812,13 @@ export default function App() {
       <div style={{minHeight:"100vh",background:isin?"#f0fdf4":"#f8f6f2",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"28px 16px",position:"relative"}}>
         <style>{CSS}</style>
         {toast&&<Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
-        <button onClick={()=>{setScreen("home");setActiveW(null);setGeoState({status:"idle",msg:""}); }} style={{position:"absolute",top:24,left:24,background:"none",border:"none",cursor:"pointer",fontSize:22,color:"#bbb"}}>â†</button>
+        <button onClick={()=>{setScreen("home");setActiveW(null);setGeoState({status:"idle",msg:""}); }} style={{position:"absolute",top:24,left:24,background:"none",border:"none",cursor:"pointer",fontSize:22,color:"#bbb"}}>←</button>
         <div style={{width:"100%",maxWidth:380,textAlign:"center"}}>
           <Logo size={52}/>
           <div style={{width:88,height:88,borderRadius:"50%",margin:"16px auto 10px",background:isin?"#dcfce7":"#f3f0ea",display:"flex",alignItems:"center",justifyContent:"center",fontSize:30,fontWeight:700,color:isin?T.green:"#aaa",border:isin?`3px solid ${T.green}`:"3px solid #e5e0d5"}}>{activeW.name.split(" ").map(n=>n[0]).join("")}</div>
           <h2 style={{fontFamily:"Georgia,serif",fontSize:24,margin:"0 0 4px",color:"#0a0a0a"}}>{activeW.name}</h2>
-          {activeW.geo_bypass&&<div style={{fontSize:12,color:T.amber,marginBottom:6}}>ðŸ  Remote worker</div>}
-          <div style={{fontSize:13,color:isin?T.green:"#ccc",marginBottom:18,fontWeight:600}}>{isin?`â— CLOCKED IN since ${fmtTime(active?.clock_in)}`:"â—‹ NOT CLOCKED IN"}</div>
+          {activeW.geo_bypass&&<div style={{fontSize:12,color:T.amber,marginBottom:6}}>🏠 Remote worker</div>}
+          <div style={{fontSize:13,color:isin?T.green:"#ccc",marginBottom:18,fontWeight:600}}>{isin?`● CLOCKED IN since ${fmtTime(active?.clock_in)}`:"○ NOT CLOCKED IN"}</div>
           <ClockFace now={now}/>
           <div style={{display:"flex",gap:10,marginBottom:20}}>
             {[{l:"Today",v:`${th.toFixed(2)}h`},{l:"This Week",v:`${wh.toFixed(2)}h`},{l:"Est. Pay",v:fmtMoney(wh*activeW.rate)}].map(s=>(
@@ -827,7 +827,7 @@ export default function App() {
               </div>
             ))}
           </div>
-          {ds?.active&&<div style={{background:"#fff",borderRadius:12,padding:"10px 16px",marginBottom:16,fontSize:13,color:"#888",textAlign:"left",boxShadow:"0 2px 8px rgba(0,0,0,.06)"}}>ðŸ•’ Today's shift: <strong style={{color:"#0a0a0a"}}>{fmt24(ds.start)} â€“ {fmt24(ds.end)}</strong></div>}
+          {ds?.active&&<div style={{background:"#fff",borderRadius:12,padding:"10px 16px",marginBottom:16,fontSize:13,color:"#888",textAlign:"left",boxShadow:"0 2px 8px rgba(0,0,0,.06)"}}>🕒 Today's shift: <strong style={{color:"#0a0a0a"}}>{fmt24(ds.start)} – {fmt24(ds.end)}</strong></div>}
           {geoState.status!=="idle"&&(
             <div style={{background:"#fff",borderRadius:12,padding:"10px 16px",marginBottom:16,fontSize:13,color:geoColor,textAlign:"left",boxShadow:"0 2px 8px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:8}}>
               {geoState.status==="checking"&&<div style={{width:14,height:14,border:`2px solid ${T.amber}`,borderTop:"2px solid transparent",borderRadius:"50%",animation:"spin 1s linear infinite",flexShrink:0}}/>}
@@ -835,17 +835,17 @@ export default function App() {
             </div>
           )}
           {!isin
-            ?<button onClick={()=>geoClockIn(activeW.id)} disabled={busy} style={{width:"100%",padding:20,background:busy?"#aaa":T.green,color:"#fff",border:"none",borderRadius:16,fontSize:20,fontWeight:700,cursor:busy?"wait":"pointer",boxShadow:"0 8px 28px rgba(22,163,74,.38)",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}><span style={{fontSize:26}}>â—</span>{geoState.status==="checking"?"Checking locationâ€¦":saving?"Savingâ€¦":"CLOCK IN"}</button>
-            :<button onClick={()=>clockOut(activeW.id)} disabled={saving} style={{width:"100%",padding:20,background:saving?"#aaa":T.red,color:"#fff",border:"none",borderRadius:16,fontSize:20,fontWeight:700,cursor:saving?"wait":"pointer",boxShadow:"0 8px 28px rgba(220,38,38,.38)",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}><span style={{fontSize:26}}>â– </span>{saving?"Savingâ€¦":"CLOCK OUT"}</button>
+            ?<button onClick={()=>geoClockIn(activeW.id)} disabled={busy} style={{width:"100%",padding:20,background:busy?"#aaa":T.green,color:"#fff",border:"none",borderRadius:16,fontSize:20,fontWeight:700,cursor:busy?"wait":"pointer",boxShadow:"0 8px 28px rgba(22,163,74,.38)",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}><span style={{fontSize:26}}>●</span>{geoState.status==="checking"?"Checking location…":saving?"Saving…":"CLOCK IN"}</button>
+            :<button onClick={()=>clockOut(activeW.id)} disabled={saving} style={{width:"100%",padding:20,background:saving?"#aaa":T.red,color:"#fff",border:"none",borderRadius:16,fontSize:20,fontWeight:700,cursor:saving?"wait":"pointer",boxShadow:"0 8px 28px rgba(220,38,38,.38)",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}><span style={{fontSize:26}}>■</span>{saving?"Saving…":"CLOCK OUT"}</button>
           }
           {te.length>0&&(
             <div style={{marginTop:20,background:"#fff",borderRadius:12,padding:16,textAlign:"left",boxShadow:"0 2px 8px rgba(0,0,0,.06)"}}>
               <div style={{fontWeight:700,fontSize:12,marginBottom:10,color:"#0a0a0a",letterSpacing:.5}}>TODAY'S LOG</div>
               {te.map((e,i)=>(
                 <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:"1px solid #f3f0ea",fontSize:13}}>
-                  <span style={{color:T.green}}>â–² {fmtTime(e.clock_in)}</span>
-                  <span style={{color:e.clock_out?T.red:T.amber}}>{e.clock_out?`â–¼ ${fmtTime(e.clock_out)}`:"â— Active"}</span>
-                  <span style={{color:"#aaa"}}>{e.clock_out?`${((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2)}h`:"â€¦"}</span>
+                  <span style={{color:T.green}}>▲ {fmtTime(e.clock_in)}</span>
+                  <span style={{color:e.clock_out?T.red:T.amber}}>{e.clock_out?`▼ ${fmtTime(e.clock_out)}`:"● Active"}</span>
+                  <span style={{color:"#aaa"}}>{e.clock_out?`${((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2)}h`:"…"}</span>
                 </div>
               ))}
             </div>
@@ -864,7 +864,7 @@ export default function App() {
       {id:"dashboard",l:"Dashboard"},{id:"payroll",l:"Payroll"},{id:"workers",l:"Workers"},
       {id:"logs",l:"Logs"},{id:"schedule",l:"Schedule"},
       {id:"alerts",l:`Alerts${reminders.length>0?` (${reminders.length})`:""}`},
-      {id:"settings",l:"âš™ Settings"},
+      {id:"settings",l:"⚙ Settings"},
     ];
 
     return(
@@ -881,8 +881,8 @@ export default function App() {
             <div style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(0,0,0,.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
               <div style={{background:T.surface,borderRadius:20,width:"100%",maxWidth:500,border:`1px solid ${T.gold}`,maxHeight:"92vh",overflowY:"auto"}}>
                 <div style={{padding:"20px 24px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div><div style={{fontFamily:"Georgia,serif",fontSize:21,fontWeight:700}}>Record Payment</div><div style={{fontSize:13,color:T.muted,marginTop:3}}>{w.name}{w.email&&<span style={{color:T.faint}}> Â· {w.email}</span>}</div></div>
-                  <button onClick={()=>{setPayModal(null);setPayHourAlert(null);}} style={{background:T.border,border:"none",color:"#888",width:34,height:34,borderRadius:"50%",cursor:"pointer",fontSize:18}}>âœ•</button>
+                  <div><div style={{fontFamily:"Georgia,serif",fontSize:21,fontWeight:700}}>Record Payment</div><div style={{fontSize:13,color:T.muted,marginTop:3}}>{w.name}{w.email&&<span style={{color:T.faint}}> · {w.email}</span>}</div></div>
+                  <button onClick={()=>{setPayModal(null);setPayHourAlert(null);}} style={{background:T.border,border:"none",color:"#888",width:34,height:34,borderRadius:"50%",cursor:"pointer",fontSize:18}}>✕</button>
                 </div>
                 <div style={{padding:"20px 24px"}}>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:22}}>
@@ -896,17 +896,17 @@ export default function App() {
                   {/* Hourly rate info */}
                   <div style={{background:T.dark,borderRadius:10,padding:"10px 14px",marginBottom:16,border:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                     <div style={{fontSize:12,color:T.faint}}>
-                      <span style={{color:T.muted,fontWeight:700}}>Rate:</span> ${w.rate}/hr &nbsp;Â·&nbsp;
-                      <span style={{color:T.muted,fontWeight:700}}>This payment covers:</span> <span style={{color:rt>0?T.gold:T.faint}}>{rt>0?`${hoursBeingPaid.toFixed(2)}h (${wholeHours} whole hour${wholeHours!==1?"s":""})`:"â€”"}</span>
+                      <span style={{color:T.muted,fontWeight:700}}>Rate:</span> ${w.rate}/hr &nbsp;·&nbsp;
+                      <span style={{color:T.muted,fontWeight:700}}>This payment covers:</span> <span style={{color:rt>0?T.gold:T.faint}}>{rt>0?`${hoursBeingPaid.toFixed(2)}h (${wholeHours} whole hour${wholeHours!==1?"s":""})`:"—"}</span>
                     </div>
                   </div>
 
-                  {/* â”€â”€ Hour alert banner â”€â”€ */}
+                  {/* ── Hour alert banner ── */}
                   {payHourAlert&&(
                     <div style={{background:"#1a0a00",border:`2px solid ${T.amber}`,borderRadius:12,padding:"14px 18px",marginBottom:16,display:"flex",gap:12,alignItems:"flex-start"}}>
-                      <span style={{fontSize:24,flexShrink:0}}>âš ï¸</span>
+                      <span style={{fontSize:24,flexShrink:0}}>⚠️</span>
                       <div>
-                        <div style={{color:T.amber,fontWeight:700,fontSize:14,marginBottom:4}}>Incomplete Hour â€” Cash Required</div>
+                        <div style={{color:T.amber,fontWeight:700,fontSize:14,marginBottom:4}}>Incomplete Hour — Cash Required</div>
                         <div style={{color:"#f5c07a",fontSize:13,lineHeight:1.6}}>
                           The current total <strong style={{color:"#fff"}}>{fmtMoney(rt)}</strong> does not complete a whole hour at <strong style={{color:"#fff"}}>${w.rate}/hr</strong>.
                           To finish the process, you must give <strong style={{color:T.amber,fontSize:15}}>{fmtMoney(payHourAlert.needed)}</strong> more in cash to complete the hour.
@@ -916,7 +916,7 @@ export default function App() {
                     </div>
                   )}
 
-                  {w.email&&settings.resendKey&&<div style={{background:T.greenBg,border:`1px solid ${T.green}`,borderRadius:8,padding:"8px 14px",marginBottom:16,fontSize:12,color:"#4ade80"}}>âœ‰ï¸ Confirmation email will be sent to {w.email}</div>}
+                  {w.email&&settings.resendKey&&<div style={{background:T.greenBg,border:`1px solid ${T.green}`,borderRadius:8,padding:"8px 14px",marginBottom:16,fontSize:12,color:"#4ade80"}}>✉️ Confirmation email will be sent to {w.email}</div>}
                   <div style={{fontSize:12,color:T.faint,fontWeight:700,letterSpacing:1,marginBottom:10}}>PAYMENT METHOD(S)</div>
                   {payRows.map((row,i)=>(
                     <div key={i} style={{marginBottom:12,padding:"12px 14px",background:T.dark,borderRadius:10,border:`1px solid ${T.border}`}}>
@@ -928,7 +928,7 @@ export default function App() {
                           <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:T.faint,fontSize:15}}>$</span>
                           <input type="number" value={row.amount} min="0" step="0.01" onChange={e=>updRow(i,"amount",e.target.value)} placeholder="0.00" style={{...inp({padding:"11px 12px 11px 26px",fontSize:16})}}/>
                         </div>
-                        {payRows.length>1&&<button onClick={()=>delRow(i)} style={{background:T.redBg,border:"none",color:T.red,width:36,height:36,borderRadius:8,cursor:"pointer",fontSize:18}}>âœ•</button>}
+                        {payRows.length>1&&<button onClick={()=>delRow(i)} style={{background:T.redBg,border:"none",color:T.red,width:36,height:36,borderRadius:8,cursor:"pointer",fontSize:18}}>✕</button>}
                       </div>
                       {row.method==="Check"&&(
                         <div style={{marginTop:10}}>
@@ -938,17 +938,17 @@ export default function App() {
                       )}
                     </div>
                   ))}
-                  <button onClick={addRow} style={{width:"100%",padding:"9px",background:"transparent",border:`1px dashed ${T.border}`,borderRadius:8,color:T.faint,cursor:"pointer",fontSize:13,marginBottom:16}}>+ Split â€” Add Another Method</button>
+                  <button onClick={addRow} style={{width:"100%",padding:"9px",background:"transparent",border:`1px dashed ${T.border}`,borderRadius:8,color:T.faint,cursor:"pointer",fontSize:13,marginBottom:16}}>+ Split — Add Another Method</button>
                   <div style={{background:T.dark,borderRadius:12,padding:"13px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center",border:`1px solid ${payHourAlert?T.amber:T.border}`}}>
                     <span style={{color:T.faint,fontSize:14}}>Total</span>
                     <span style={{color:payHourAlert?T.amber:T.gold,fontSize:22,fontWeight:700}}>{fmtMoney(rt)}</span>
                   </div>
                   <div style={{marginBottom:20}}>
                     <label style={{fontSize:12,color:T.faint,display:"block",marginBottom:6}}>Note (optional)</label>
-                    <input type="text" value={payNote} onChange={e=>setPayNote(e.target.value)} placeholder="Weekly pay, partial, bonusâ€¦" style={inp()}/>
+                    <input type="text" value={payNote} onChange={e=>setPayNote(e.target.value)} placeholder="Weekly pay, partial, bonus…" style={inp()}/>
                   </div>
                   <div style={{display:"flex",gap:10}}>
-                    <button onClick={submitPay} disabled={saving} style={{flex:2,padding:14,background:saving?T.faint:T.gold,border:"none",borderRadius:12,fontWeight:700,cursor:saving?"wait":"pointer",color:T.dark,fontSize:16}}>{saving?"Savingâ€¦":"âœ“ Complete Payment"}</button>
+                    <button onClick={submitPay} disabled={saving} style={{flex:2,padding:14,background:saving?T.faint:T.gold,border:"none",borderRadius:12,fontWeight:700,cursor:saving?"wait":"pointer",color:T.dark,fontSize:16}}>{saving?"Saving…":"✓ Complete Payment"}</button>
                     <button onClick={()=>{setPayModal(null);setPayHourAlert(null);}} style={{flex:1,padding:14,background:T.border,border:"none",borderRadius:12,color:"#888",cursor:"pointer"}}>Cancel</button>
                   </div>
                 </div>
@@ -964,8 +964,8 @@ export default function App() {
             <div><div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700}}>MCX Manager</div><div style={{fontSize:11,color:"rgba(255,255,255,.5)"}}>Payroll & Time System</div></div>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            {saving&&<div style={{fontSize:12,color:T.gold}}>Savingâ€¦</div>}
-            <button onClick={()=>setScreen("home")} style={{background:T.brandDark,border:"none",color:"rgba(255,255,255,.7)",padding:"7px 14px",borderRadius:8,cursor:"pointer",fontSize:13}}>â† Exit</button>
+            {saving&&<div style={{fontSize:12,color:T.gold}}>Saving…</div>}
+            <button onClick={()=>setScreen("home")} style={{background:T.brandDark,border:"none",color:"rgba(255,255,255,.7)",padding:"7px 14px",borderRadius:8,cursor:"pointer",fontSize:13}}>← Exit</button>
           </div>
         </div>
 
@@ -983,7 +983,7 @@ export default function App() {
             <div>
               <ClockFace now={now} dark/>
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(148px,1fr))",gap:12,marginBottom:24}}>
-                {[{l:"Workers",v:workers.length,i:"ðŸ‘¥"},{l:"Clocked In",v:totalIn,i:"âœ…",c:T.green},{l:"Weekly Hrs",v:`${totH.toFixed(1)}h`,i:"â±"},{l:"Total Earned",v:fmtMoney(totE),i:"ðŸ’µ",c:T.gold},{l:"Total Paid",v:fmtMoney(totP),i:"âœ“",c:"#4ade80"},{l:"Outstanding",v:fmtMoney(Math.max(0,totE-totP)),i:"âš ï¸",c:T.red}].map(k=>(
+                {[{l:"Workers",v:workers.length,i:"👥"},{l:"Clocked In",v:totalIn,i:"✅",c:T.green},{l:"Weekly Hrs",v:`${totH.toFixed(1)}h`,i:"⏱"},{l:"Total Earned",v:fmtMoney(totE),i:"💵",c:T.gold},{l:"Total Paid",v:fmtMoney(totP),i:"✓",c:"#4ade80"},{l:"Outstanding",v:fmtMoney(Math.max(0,totE-totP)),i:"⚠️",c:T.red}].map(k=>(
                   <div key={k.l} style={{background:T.surface,borderRadius:14,padding:"16px 14px",border:`1px solid ${T.border}`}}>
                     <div style={{fontSize:22,marginBottom:6}}>{k.i}</div><div style={{fontSize:22,fontWeight:700,color:k.c||"#fff",fontFamily:"Georgia,serif"}}>{k.v}</div><div style={{fontSize:11,color:T.faint,marginTop:3}}>{k.l}</div>
                   </div>
@@ -998,8 +998,8 @@ export default function App() {
                       const isin=ci(w.id),wh=wkHrs(w.id),e=earned$(w.id,w.rate),p=paid$(w.id),b=bal$(w.id,w.rate);
                       return(<tr key={w.id} style={{borderTop:`1px solid ${T.border}`,background:i%2===0?T.surface:T.surfaceAlt}}>
                         <td style={{padding:"11px 14px",fontFamily:"Georgia,serif",fontSize:14,fontWeight:600}}>{w.name}</td>
-                        <td style={{padding:"11px 14px"}}><span style={{padding:"3px 9px",borderRadius:20,fontSize:11,fontWeight:700,background:isin?T.greenBg:T.border,color:isin?"#4ade80":T.faint}}>{isin?"â— IN":"â—‹ OUT"}</span></td>
-                        <td style={{padding:"11px 14px",fontSize:11,color:w.geo_bypass?T.amber:T.green}}>{w.geo_bypass?"ðŸ ":"ðŸ“"}</td>
+                        <td style={{padding:"11px 14px"}}><span style={{padding:"3px 9px",borderRadius:20,fontSize:11,fontWeight:700,background:isin?T.greenBg:T.border,color:isin?"#4ade80":T.faint}}>{isin?"● IN":"○ OUT"}</span></td>
+                        <td style={{padding:"11px 14px",fontSize:11,color:w.geo_bypass?T.amber:T.green}}>{w.geo_bypass?"🏠":"📍"}</td>
                         <td style={{padding:"11px 14px",color:"#aaa",fontSize:13}}>{wh.toFixed(1)}h</td>
                         <td style={{padding:"11px 14px",color:T.gold,fontSize:13}}>{fmtMoney(e)}</td>
                         <td style={{padding:"11px 14px",color:"#4ade80",fontSize:13}}>{fmtMoney(p)}</td>
@@ -1018,7 +1018,7 @@ export default function App() {
             <div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16,flexWrap:"wrap",gap:10}}>
                 <h2 style={{fontFamily:"Georgia,serif",fontSize:22,margin:0}}>Payroll & Payments</h2>
-                <button onClick={()=>exportCSV({workers,entries,payments,reminders,from:dateRange.from,to:dateRange.to})} style={{padding:"9px 18px",background:T.green,border:"none",borderRadius:8,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13}}>â¬‡ Export to Excel</button>
+                <button onClick={()=>exportCSV({workers,entries,payments,reminders,from:dateRange.from,to:dateRange.to})} style={{padding:"9px 18px",background:T.green,border:"none",borderRadius:8,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13}}>⬇ Export to Excel</button>
               </div>
               <DateRange from={dateRange.from} to={dateRange.to} onChange={setDateRange}/>
               {workers.map(w=>{
@@ -1027,9 +1027,9 @@ export default function App() {
                 return(
                   <div key={w.id} style={{background:T.surface,borderRadius:16,border:`1px solid ${T.border}`,overflow:"hidden",marginBottom:16}}>
                     <div style={{padding:"18px 22px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
-                      <div><div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700}}>{w.name}</div><div style={{fontSize:12,color:T.faint,marginTop:3}}>{wh.toFixed(2)} hrs Â· ${w.rate}/hr{(dateRange.from||dateRange.to)?" Â· filtered":""}</div></div>
+                      <div><div style={{fontFamily:"Georgia,serif",fontSize:18,fontWeight:700}}>{w.name}</div><div style={{fontSize:12,color:T.faint,marginTop:3}}>{wh.toFixed(2)} hrs · ${w.rate}/hr{(dateRange.from||dateRange.to)?" · filtered":""}</div></div>
                       <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
-                        <button onClick={()=>exportCSV({workers:[w],entries:fe.map(e=>({...e,worker_id:w.id})),payments:fp,reminders:reminders.filter(r=>r.workerId===w.id),from:dateRange.from,to:dateRange.to})} style={{padding:"8px 14px",background:T.green,border:"none",borderRadius:8,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:12}}>â¬‡ Export</button>
+                        <button onClick={()=>exportCSV({workers:[w],entries:fe.map(e=>({...e,worker_id:w.id})),payments:fp,reminders:reminders.filter(r=>r.workerId===w.id),from:dateRange.from,to:dateRange.to})} style={{padding:"8px 14px",background:T.green,border:"none",borderRadius:8,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:12}}>⬇ Export</button>
                         <div style={{textAlign:"right"}}><div style={{fontSize:11,color:T.faint}}>Balance Due</div><div style={{fontSize:24,fontWeight:700,color:b>0?T.red:"#4ade80"}}>{fmtMoney(b)}</div></div>
                         <button onClick={()=>openPay(w.id)} style={{padding:"11px 22px",background:T.gold,border:"none",borderRadius:10,color:T.dark,fontWeight:700,cursor:"pointer",fontSize:14}}>Pay Worker</button>
                       </div>
@@ -1043,7 +1043,7 @@ export default function App() {
                     </div>
                     {fp.length>0||fe.length>0?(
                       <div style={{padding:"14px 22px"}}>
-                        <div style={{fontSize:11,color:T.faint,fontWeight:700,letterSpacing:1,marginBottom:12}}>PAYMENT HISTORY â€” BY WEEK</div>
+                        <div style={{fontSize:11,color:T.faint,fontWeight:700,letterSpacing:1,marginBottom:12}}>PAYMENT HISTORY — BY WEEK</div>
                         {(()=>{
                           const weeks = buildWorkerWeeks(fe, fp);
                           if (!weeks.length) return <div style={{color:T.faint,fontSize:13}}>No data in this period.</div>;
@@ -1059,7 +1059,7 @@ export default function App() {
                                 {/* Week header */}
                                 <div style={{padding:"10px 16px",background:T.surfaceAlt,borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}}>
                                   <div style={{fontFamily:"Georgia,serif",fontWeight:700,fontSize:14,color:T.gold}}>
-                                    Week {wi+1}: {sunLabel} â€“ {friLabel}
+                                    Week {wi+1}: {sunLabel} – {friLabel}
                                   </div>
                                   <div style={{display:"flex",gap:16,fontSize:12}}>
                                     <span style={{color:T.faint}}>Worked: <strong style={{color:"#fff"}}>{wkHrsWorked.toFixed(2)}h</strong></span>
@@ -1109,13 +1109,13 @@ export default function App() {
                     <div key={field} style={{marginBottom:10}}><label style={{fontSize:12,color:T.faint,display:"block",marginBottom:4}}>{label}</label><input type={type} value={newW[field]||""} onChange={e=>setNewW(p=>({...p,[field]:e.target.value}))} style={inp()}/></div>
                   ))}
                   <div style={{marginTop:14,marginBottom:14,padding:"12px 14px",background:T.dark,borderRadius:10,border:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <div><div style={{fontSize:13,fontWeight:700}}>ðŸ  Remote Worker</div><div style={{fontSize:11,color:T.faint,marginTop:3}}>Bypass location check</div></div>
+                    <div><div style={{fontSize:13,fontWeight:700}}>🏠 Remote Worker</div><div style={{fontSize:11,color:T.faint,marginTop:3}}>Bypass location check</div></div>
                     <Toggle on={!!newW.geo_bypass} onChange={()=>setNewW(p=>({...p,geo_bypass:!p.geo_bypass}))}/>
                   </div>
                   <div style={{marginBottom:8}}><label style={{fontSize:12,color:T.faint,fontWeight:700,letterSpacing:1}}>SCHEDULE</label></div>
                   <SchedEditor schedule={newWSched} onChange={setNewWSched}/>
                   <div style={{display:"flex",gap:8,marginTop:14}}>
-                    <button onClick={addWorker} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Savingâ€¦":"Save Worker"}</button>
+                    <button onClick={addWorker} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Saving…":"Save Worker"}</button>
                     <button onClick={()=>setAddingW(false)} style={{flex:1,padding:"9px",background:T.border,border:"none",borderRadius:8,color:"#888",cursor:"pointer"}}>Cancel</button>
                   </div>
                 </div>
@@ -1129,13 +1129,13 @@ export default function App() {
                           <div key={field} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><label style={{fontSize:11,color:T.faint,width:90}}>{label}</label><input type={type} value={editForm[field]||""} onChange={e=>setEditForm(p=>({...p,[field]:e.target.value}))} style={{...inp({flex:1,width:"auto"})}}/></div>
                         ))}
                         <div style={{marginTop:12,marginBottom:12,padding:"12px 14px",background:T.dark,borderRadius:10,border:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                          <div><div style={{fontSize:13,fontWeight:700}}>ðŸ  Remote Worker</div><div style={{fontSize:11,color:T.faint,marginTop:3}}>Bypass location check</div></div>
+                          <div><div style={{fontSize:13,fontWeight:700}}>🏠 Remote Worker</div><div style={{fontSize:11,color:T.faint,marginTop:3}}>Bypass location check</div></div>
                           <Toggle on={!!editForm.geo_bypass} onChange={()=>setEditForm(p=>({...p,geo_bypass:!p.geo_bypass}))}/>
                         </div>
                         <div style={{marginBottom:8}}><label style={{fontSize:12,color:T.faint,fontWeight:700,letterSpacing:1}}>SCHEDULE</label></div>
                         <SchedEditor schedule={editSched} onChange={setEditSched}/>
                         <div style={{display:"flex",gap:8,marginTop:12}}>
-                          <button onClick={()=>saveEdit(w.id)} disabled={saving} style={{flex:1,padding:"8px",background:T.gold,border:"none",borderRadius:6,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Savingâ€¦":"Save Changes"}</button>
+                          <button onClick={()=>saveEdit(w.id)} disabled={saving} style={{flex:1,padding:"8px",background:T.gold,border:"none",borderRadius:6,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Saving…":"Save Changes"}</button>
                           <button onClick={()=>{setEditWid(null);setEditSched(null);}} style={{flex:1,padding:"8px",background:T.border,border:"none",borderRadius:6,color:"#888",cursor:"pointer"}}>Cancel</button>
                         </div>
                       </div>
@@ -1143,13 +1143,13 @@ export default function App() {
                       <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between"}}>
                         <div style={{flex:1}}>
                           <div style={{fontFamily:"Georgia,serif",fontSize:15,fontWeight:700}}>{w.name}</div>
-                          <div style={{fontSize:12,color:T.faint,marginTop:3}}>PIN: â€¢â€¢â€¢â€¢  Â·  ${w.rate}/hr{w.email?`  Â·  ${w.email}`:""}</div>
-                          <div style={{fontSize:11,color:T.faint,marginTop:4,opacity:.8}}>ðŸ“… {schedSummary(getSched(w))}</div>
-                          <div style={{fontSize:11,marginTop:3,color:w.geo_bypass?T.amber:T.green}}>{w.geo_bypass?"ðŸ  Remote":"ðŸ“ On-site"}</div>
+                          <div style={{fontSize:12,color:T.faint,marginTop:3}}>PIN: ••••  ·  ${w.rate}/hr{w.email?`  ·  ${w.email}`:""}</div>
+                          <div style={{fontSize:11,color:T.faint,marginTop:4,opacity:.8}}>📅 {schedSummary(getSched(w))}</div>
+                          <div style={{fontSize:11,marginTop:3,color:w.geo_bypass?T.amber:T.green}}>{w.geo_bypass?"🏠 Remote":"📍 On-site"}</div>
                         </div>
                         <div style={{display:"flex",gap:8,flexShrink:0,marginLeft:10}}>
                           <button onClick={()=>{setEditWid(w.id);setEditForm({name:w.name,pin:w.pin,rate:w.rate,email:w.email||"",phone:w.phone||"",geo_bypass:!!w.geo_bypass});setEditSched(getSched(w));}} style={{padding:"6px 14px",background:T.border,border:"none",borderRadius:6,color:"#aaa",cursor:"pointer",fontSize:13}}>Edit</button>
-                          <button onClick={()=>deleteW(w.id,w.name)} style={{padding:"6px 10px",background:T.redBg,border:"none",borderRadius:6,color:T.red,cursor:"pointer",fontSize:13}}>âœ•</button>
+                          <button onClick={()=>deleteW(w.id,w.name)} style={{padding:"6px 10px",background:T.redBg,border:"none",borderRadius:6,color:T.red,cursor:"pointer",fontSize:13}}>✕</button>
                         </div>
                       </div>
                     )}
@@ -1174,7 +1174,7 @@ export default function App() {
                     <div key={field} style={{marginBottom:10}}><label style={{fontSize:12,color:T.faint,display:"block",marginBottom:4}}>{label}</label><input type={type} value={manEntry[field]} onChange={e=>setManEntry(p=>({...p,[field]:e.target.value}))} style={inp()}/></div>
                   ))}
                   <div style={{display:"flex",gap:8,marginTop:10}}>
-                    <button onClick={saveManual} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Savingâ€¦":"Save Entry"}</button>
+                    <button onClick={saveManual} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Saving…":"Save Entry"}</button>
                     <button onClick={()=>setManEntry(null)} style={{flex:1,padding:"9px",background:T.border,border:"none",borderRadius:8,color:"#888",cursor:"pointer"}}>Cancel</button>
                   </div>
                 </div>
@@ -1189,20 +1189,20 @@ export default function App() {
                     const outT=e.clock_out?`${pad(new Date(e.clock_out).getHours())}:${pad(new Date(e.clock_out).getMinutes())}`:"";
                     return(
                       <div key={e.id||i} style={{position:"relative",padding:"10px 18px",borderBottom:`1px solid ${T.dark}`,display:"flex",justifyContent:"space-between",fontSize:13,alignItems:"center"}}>
-                        {/* Three-dot button â€” top-front */}
+                        {/* Three-dot button — top-front */}
                         <div style={{position:"absolute",top:6,left:8,zIndex:10}}>
-                          <button onClick={()=>setLogMenu(menuOpen?null:e.id)} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:18,padding:"2px 6px",borderRadius:6,lineHeight:1}} title="Options">â‹®</button>
+                          <button onClick={()=>setLogMenu(menuOpen?null:e.id)} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:18,padding:"2px 6px",borderRadius:6,lineHeight:1}} title="Options">⋮</button>
                           {menuOpen&&(
                             <div style={{position:"absolute",top:"100%",left:0,background:T.surface,border:`1px solid ${T.borderHi}`,borderRadius:10,boxShadow:"0 8px 24px rgba(0,0,0,.5)",zIndex:200,minWidth:120,overflow:"hidden"}}>
-                              <button onClick={()=>{setEditEntry({id:e.id,workerId:w.id,date:dateStr,inTime:inT,outTime:outT});setLogMenu(null);}} style={{width:"100%",padding:"10px 16px",background:"none",border:"none",color:"#fff",cursor:"pointer",textAlign:"left",fontSize:13,display:"flex",alignItems:"center",gap:8}}>âœï¸ Edit</button>
-                              <button onClick={()=>{setLogMenu(null);deleteEntry(e.id);}} style={{width:"100%",padding:"10px 16px",background:"none",border:"none",color:T.red,cursor:"pointer",textAlign:"left",fontSize:13,display:"flex",alignItems:"center",gap:8}}>ðŸ—‘ Delete</button>
+                              <button onClick={()=>{setEditEntry({id:e.id,workerId:w.id,date:dateStr,inTime:inT,outTime:outT});setLogMenu(null);}} style={{width:"100%",padding:"10px 16px",background:"none",border:"none",color:"#fff",cursor:"pointer",textAlign:"left",fontSize:13,display:"flex",alignItems:"center",gap:8}}>✏️ Edit</button>
+                              <button onClick={()=>{setLogMenu(null);deleteEntry(e.id);}} style={{width:"100%",padding:"10px 16px",background:"none",border:"none",color:T.red,cursor:"pointer",textAlign:"left",fontSize:13,display:"flex",alignItems:"center",gap:8}}>🗑 Delete</button>
                             </div>
                           )}
                         </div>
                         <span style={{color:T.faint,paddingLeft:28}}>{fmtDate(e.clock_in)}</span>
-                        <span style={{color:"#4ade80"}}>â–² {fmtTime(e.clock_in)}</span>
-                        <span style={{color:e.clock_out?T.red:T.amber}}>{e.clock_out?`â–¼ ${fmtTime(e.clock_out)}`:"â— Active"}</span>
-                        <span style={{color:"#888"}}>{e.clock_out?`${((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2)}h`:"â€¦"}</span>
+                        <span style={{color:"#4ade80"}}>▲ {fmtTime(e.clock_in)}</span>
+                        <span style={{color:e.clock_out?T.red:T.amber}}>{e.clock_out?`▼ ${fmtTime(e.clock_out)}`:"● Active"}</span>
+                        <span style={{color:"#888"}}>{e.clock_out?`${((new Date(e.clock_out)-new Date(e.clock_in))/3600000).toFixed(2)}h`:"…"}</span>
                         {e.manual&&<span style={{color:T.gold,fontSize:11}}>Manual</span>}
                       </div>
                     );
@@ -1218,7 +1218,7 @@ export default function App() {
                       <div key={field} style={{marginBottom:12}}><label style={{fontSize:12,color:T.faint,display:"block",marginBottom:4}}>{label}</label><input type={type} value={editEntry[field]||""} onChange={ev=>setEditEntry(p=>({...p,[field]:ev.target.value}))} style={inp()}/></div>
                     ))}
                     <div style={{display:"flex",gap:8,marginTop:16}}>
-                      <button onClick={saveEditEntry} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Savingâ€¦":"Save Changes"}</button>
+                      <button onClick={saveEditEntry} disabled={saving} style={{flex:1,padding:"9px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark}}>{saving?"Saving…":"Save Changes"}</button>
                       <button onClick={()=>setEditEntry(null)} style={{flex:1,padding:"9px",background:T.border,border:"none",borderRadius:8,color:"#888",cursor:"pointer"}}>Cancel</button>
                     </div>
                   </div>
@@ -1234,10 +1234,10 @@ export default function App() {
               {workers.map(w=>{const sched=getSched(w),isOpen=expandSch===w.id;return(
                 <div key={w.id} style={{background:T.surface,borderRadius:14,border:`1px solid ${isOpen?T.gold:T.border}`,marginBottom:12,overflow:"hidden"}}>
                   <div style={{padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}} onClick={()=>{if(isOpen)setExpandSch(null);else{setExpandSch(w.id);setSchDraft(sched);}}}>
-                    <div><div style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:700}}>{w.name}</div><div style={{fontSize:12,color:T.faint,marginTop:4}}>ðŸ“… {schedSummary(sched)}</div></div>
-                    <div style={{color:T.gold,fontSize:18}}>{isOpen?"â–²":"â–¼"}</div>
+                    <div><div style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:700}}>{w.name}</div><div style={{fontSize:12,color:T.faint,marginTop:4}}>📅 {schedSummary(sched)}</div></div>
+                    <div style={{color:T.gold,fontSize:18}}>{isOpen?"▲":"▼"}</div>
                   </div>
-                  {isOpen&&(<div style={{padding:"0 20px 20px",borderTop:`1px solid ${T.border}`}}><div style={{marginTop:16}}><SchedEditor schedule={schDraft} onChange={setSchDraft}/></div><div style={{display:"flex",gap:10,marginTop:16}}><button onClick={()=>saveSchTab(w.id)} disabled={saving} style={{flex:1,padding:"10px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark,fontSize:14}}>{saving?"Savingâ€¦":"âœ“ Save Schedule"}</button><button onClick={()=>setExpandSch(null)} style={{flex:1,padding:"10px",background:T.border,border:"none",borderRadius:8,color:"#888",cursor:"pointer"}}>Cancel</button></div></div>)}
+                  {isOpen&&(<div style={{padding:"0 20px 20px",borderTop:`1px solid ${T.border}`}}><div style={{marginTop:16}}><SchedEditor schedule={schDraft} onChange={setSchDraft}/></div><div style={{display:"flex",gap:10,marginTop:16}}><button onClick={()=>saveSchTab(w.id)} disabled={saving} style={{flex:1,padding:"10px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark,fontSize:14}}>{saving?"Saving…":"✓ Save Schedule"}</button><button onClick={()=>setExpandSch(null)} style={{flex:1,padding:"10px",background:T.border,border:"none",borderRadius:8,color:"#888",cursor:"pointer"}}>Cancel</button></div></div>)}
                 </div>
               );})}
             </div>
@@ -1253,35 +1253,35 @@ export default function App() {
                 </div>
               </div>
               {reminders.length===0?(
-                <div style={{background:T.surface,borderRadius:14,padding:40,border:`1px solid ${T.border}`,textAlign:"center"}}><div style={{fontSize:36,marginBottom:10}}>âœ…</div><div style={{color:T.faint}}>No alerts. All workers are on schedule.</div></div>
+                <div style={{background:T.surface,borderRadius:14,padding:40,border:`1px solid ${T.border}`,textAlign:"center"}}><div style={{fontSize:36,marginBottom:10}}>✅</div><div style={{color:T.faint}}>No alerts. All workers are on schedule.</div></div>
               ):(
-                <div style={{display:"grid",gap:10}}>{reminders.slice().reverse().map(r=>(<div key={r.id} style={{background:T.amberBg,borderRadius:12,padding:"14px 18px",border:"1px solid #3a2800",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontSize:14,color:T.amber,marginBottom:3}}>{r.msg}</div><div style={{fontSize:11,color:T.faint}}>{fmtDate(r.ts)} {fmtTime(r.ts)}</div></div><button onClick={()=>setReminders(p=>p.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:18,paddingLeft:12}}>âœ•</button></div>))}</div>
+                <div style={{display:"grid",gap:10}}>{reminders.slice().reverse().map(r=>(<div key={r.id} style={{background:T.amberBg,borderRadius:12,padding:"14px 18px",border:"1px solid #3a2800",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontSize:14,color:T.amber,marginBottom:3}}>{r.msg}</div><div style={{fontSize:11,color:T.faint}}>{fmtDate(r.ts)} {fmtTime(r.ts)}</div></div><button onClick={()=>setReminders(p=>p.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:18,paddingLeft:12}}>✕</button></div>))}</div>
               )}
             </div>
           )}
 
-          {/* â”€â”€ SETTINGS â”€â”€ */}
+          {/* ── SETTINGS ── */}
           {mTab==="settings"&&(
             <div style={{maxWidth:620}}>
               <h2 style={{fontFamily:"Georgia,serif",fontSize:22,marginBottom:20}}>Settings</h2>
 
               {/* Manager PIN */}
-              <SettingsCard title="Manager PIN" icon="ðŸ”">
+              <SettingsCard title="Manager PIN" icon="🔐">
                 <SettingsField label="CURRENT PIN" hint="Enter your current PIN to verify identity">
-                  <input type="password" maxLength={4} value={pinDraft.current} onChange={e=>setPinDraft(p=>({...p,current:e.target.value}))} placeholder="â€¢â€¢â€¢â€¢" style={inp({letterSpacing:8,fontSize:18,width:120})}/>
+                  <input type="password" maxLength={4} value={pinDraft.current} onChange={e=>setPinDraft(p=>({...p,current:e.target.value}))} placeholder="••••" style={inp({letterSpacing:8,fontSize:18,width:120})}/>
                 </SettingsField>
                 <SettingsField label="NEW PIN (4 digits)">
-                  <input type="password" maxLength={4} value={pinDraft.newPin} onChange={e=>setPinDraft(p=>({...p,newPin:e.target.value}))} placeholder="â€¢â€¢â€¢â€¢" style={inp({letterSpacing:8,fontSize:18,width:120})}/>
+                  <input type="password" maxLength={4} value={pinDraft.newPin} onChange={e=>setPinDraft(p=>({...p,newPin:e.target.value}))} placeholder="••••" style={inp({letterSpacing:8,fontSize:18,width:120})}/>
                 </SettingsField>
                 <SettingsField label="CONFIRM NEW PIN">
-                  <input type="password" maxLength={4} value={pinDraft.confirm} onChange={e=>setPinDraft(p=>({...p,confirm:e.target.value}))} placeholder="â€¢â€¢â€¢â€¢" style={inp({letterSpacing:8,fontSize:18,width:120})}/>
+                  <input type="password" maxLength={4} value={pinDraft.confirm} onChange={e=>setPinDraft(p=>({...p,confirm:e.target.value}))} placeholder="••••" style={inp({letterSpacing:8,fontSize:18,width:120})}/>
                 </SettingsField>
-                {pinChangeMsg&&<div style={{fontSize:13,color:pinChangeMsg.startsWith("âœ…")?T.green:T.red,marginBottom:10}}>{pinChangeMsg}</div>}
+                {pinChangeMsg&&<div style={{fontSize:13,color:pinChangeMsg.startsWith("✅")?T.green:T.red,marginBottom:10}}>{pinChangeMsg}</div>}
                 <button onClick={changePinHandler} style={{padding:"10px 22px",background:T.gold,border:"none",borderRadius:8,fontWeight:700,cursor:"pointer",color:T.dark,fontSize:14}}>Update PIN</button>
               </SettingsCard>
 
-              {/* SMS â€” Twilio */}
-              <SettingsCard title="SMS Alerts (Twilio)" icon="ðŸ“±">
+              {/* SMS — Twilio */}
+              <SettingsCard title="SMS Alerts (Twilio)" icon="📱">
                 <div style={{fontSize:13,color:T.faint,marginBottom:14,lineHeight:1.6}}>
                   Sign up free at <span style={{color:T.gold}}>twilio.com</span>. Get your Account SID, Auth Token, and a Twilio phone number. Workers must have a phone number saved to receive SMS.
                 </div>
@@ -1299,8 +1299,8 @@ export default function App() {
                 </SettingsField>
               </SettingsCard>
 
-              {/* Email â€” Resend */}
-              <SettingsCard title="Email Notifications (Resend)" icon="âœ‰ï¸">
+              {/* Email — Resend */}
+              <SettingsCard title="Email Notifications (Resend)" icon="✉️">
                 <div style={{fontSize:13,color:T.faint,marginBottom:14,lineHeight:1.6}}>
                   Sign up free at <span style={{color:T.gold}}>resend.com</span> (3,000 free emails/month). Add your domain or use their test domain. Workers must have an email saved to receive notifications.
                 </div>
@@ -1315,8 +1315,8 @@ export default function App() {
                 </SettingsField>
               </SettingsCard>
 
-              {/* App URL â€” for logo in emails */}
-              <SettingsCard title="App URL (for email logo)" icon="ðŸŒ">
+              {/* App URL — for logo in emails */}
+              <SettingsCard title="App URL (for email logo)" icon="🌐">
                 <div style={{fontSize:13,color:T.faint,marginBottom:14,lineHeight:1.6}}>
                   Your published Vercel URL. Paste it here so the MCX logo appears correctly inside payment confirmation emails sent to workers.
                 </div>
@@ -1327,7 +1327,7 @@ export default function App() {
 
               {/* Save */}
               <div style={{display:"flex",gap:12,marginTop:6}}>
-                <button onClick={saveSettingsHandler} style={{flex:1,padding:"13px",background:T.gold,border:"none",borderRadius:10,fontWeight:700,cursor:"pointer",color:T.dark,fontSize:15}}>âœ“ Save Settings</button>
+                <button onClick={saveSettingsHandler} style={{flex:1,padding:"13px",background:T.gold,border:"none",borderRadius:10,fontWeight:700,cursor:"pointer",color:T.dark,fontSize:15}}>✓ Save Settings</button>
                 <button onClick={()=>setSettingsDraft({...settings})} style={{padding:"13px 20px",background:T.border,border:"none",borderRadius:10,color:"#888",cursor:"pointer",fontSize:14}}>Discard</button>
               </div>
             </div>
@@ -1338,4 +1338,4 @@ export default function App() {
     );
   }
   return null;
-    }
+          }
